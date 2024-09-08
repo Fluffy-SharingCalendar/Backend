@@ -1,0 +1,94 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: CI/CD - build
+
+on: 
+  push:  
+    branches: ['dev']     
+  pull_request: 
+    branches: ["main", "dev"]
+
+permissions:  
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Gradle Cache
+      uses: actions/cache@v4.0.0
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+                ${{ runner.os }}-gradle-
+
+    # 프로젝트 저장소에 업로드하면 안되는 설정 파일 생성
+    - name: Make application.properties
+      run: |
+        cd ./src/main
+        cd ./resources
+        touch ./application.properties
+        echo "$APPLICATION" > ./application.properties
+      env:
+        APPLICATION: ${{ secrets.APPLICATION }}
+      shell: bash
+
+    - name: Gradle 권한 부여
+      run: chmod +x gradlew 
+
+    - name: Gradle 빌드
+      run: ./gradlew bootjar
+
+    # 빌드 실패 시 PR 닫기 및 변경 요청 추가
+    - name: Close PR, if build fails
+      if: ${{ failure() }}  # 이전 step이 실패한 경우에만 실행
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.TOKEN }}
+        script: | 
+          const pull_number = context.payload.pull_request.number;
+          const updated_title = `[BUILD FAIL] ${context.payload.pull_request.title}`;
+          await github.rest.pulls.createReview({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pull_number,
+            body: '빌드에 실패했습니다.😥 PR을 닫습니다.',
+            event: 'REQUEST_CHANGES'
+          });
+          await github.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pull_number,
+            title: updated_title,
+            state: 'closed'
+          });
+
+    - name: Comment on PR, If test passes
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.TOKEN }}
+        script: |
+          const pull_number = context.payload.pull_request.number;
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: pull_number,
+            body: '빌드에 성공했습니다.😊'
+          });
