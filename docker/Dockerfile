@@ -2,7 +2,7 @@
 FROM openjdk:17-jdk-slim
 
 # 복사할 파일 위치 설정
-ARG JAR_FILE=/build/libs/SharingCalendar-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=*.jar
 
 # 파일 복사
 COPY ${JAR_FILE} fluffy.jar
