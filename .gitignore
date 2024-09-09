@@ -1,7 +1,7 @@
 HELP.md
 .gradle
 .idea
-appspec.yml
+scripts/deploy.sh
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
