@@ -40,15 +40,16 @@ jobs:
     # 프로젝트 저장소에 업로드하면 안되는 설정 파일 생성
     - name: Make application.properties
       run: |
-        touch ./appspec.yml
-        echo "$APPSPEC" > ./appspec.yml
-        cd ./src/main
-        cd ./resources
+        mkdir scripts
+        cd ./scripts
+        echo "$DEPLOY_SH" > ./deploy.yml
+        cd ..
+        cd ./src/main/resources
         touch ./application.properties
         echo "$APPLICATION" > ./application.properties
       env:
         APPLICATION: ${{ secrets.APPLICATION }}
-        APPSPEC: ${{ secrets.APPSPEC }}
+        DEPLOY_SH: ${{ secrets.DEPLOY_SH }}
       shell: bash
 
     - name: Gradle 권한 부여
