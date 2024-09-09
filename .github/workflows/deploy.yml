@@ -1,0 +1,87 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:  
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Gradle Cache
+      uses: actions/cache@v4.0.0
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+                ${{ runner.os }}-gradle-
+
+    # 프로젝트 저장소에 업로드하면 안되는 설정 파일 생성
+    - name: Make application.properties
+      run: |
+        cd ./src/main
+        mkdir resources
+        cd ./resources
+        touch ./application.properties
+        echo "$APPLICATION" > ./application.properties
+      env:
+        APPLICATION: ${{ secrets.APPLICATION }}
+      shell: bash
+
+    - name: Gradle 권한 부여
+      run: chmod +x gradlew 
+
+    - name: Gradle 빌드
+      run: ./gradlew bootjar
+
+    - name: zip file 생성
+      run: |
+        mkdir deploy
+        cp ./docker/docker-compose.blue.yml ./deploy/
+        cp ./docker/docker-compose.green.yml ./deploy/
+        cp ./appspec.yml ./deploy/
+        cp ./docker/Dockerfile ./deploy/
+        cp ./scripts/*.sh ./deploy/
+        cp ./build/libs/*.jar ./deploy/
+        zip -r -qq -j ./spring-build.zip ./deploy
+
+    - name: AWS 연결
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: S3에 프로젝트 업로드
+      run: |
+        aws s3 cp \
+        --region ap-northeast-2 \
+        ./spring-build.zip s3://fluffy-builds-bucket
+
+    - name: ec2에 Code Deploy 배포 요청
+      run: aws deploy create-deployment 
+        --application-name fluffy-cicd
+        --deployment-config-name CodeDeployDefault.OneAtATime
+        --deployment-group-name fluffy-instance
+        --s3-location bucket=fluffy-builds-bucket,bundleType=zip,key=spring-build.zip
