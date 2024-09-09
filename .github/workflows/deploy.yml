@@ -41,7 +41,6 @@ jobs:
     - name: Make application.properties
       run: |
         cd ./src/main
-        mkdir resources
         cd ./resources
         touch ./application.properties
         echo "$APPLICATION" > ./application.properties
