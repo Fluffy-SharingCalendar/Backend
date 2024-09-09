@@ -18,7 +18,8 @@ echo "배포 시작일자 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(da
 if [ -z "$EXIST_BLUE" ]; then
     echo "blue 배포 시작 : $(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" >> $LOG_FILE
     sudo docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml up -d --build
-    sleep 30  # 배포 후 안정화 시간 대기
+    # 배포 후 안정화 시간 대기
+    sleep 30  
 
     # 블루 상태 확인
     BLUE_HEALTH=$(sudo docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml ps | grep Up)
