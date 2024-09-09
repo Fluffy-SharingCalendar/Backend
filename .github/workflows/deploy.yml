@@ -90,7 +90,7 @@ jobs:
 
     # 빌드 실패 시 PR 닫기 및 변경 요청 추가
     - name: Close PR, if build fails
-      if: ${{ failure() }}  # 이전 step이 실패한 경우에만 실행
+      if: ${{ failure() && github.event_name == 'pull_request' }} 
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.TOKEN }}
@@ -113,6 +113,7 @@ jobs:
           });
 
     - name: Comment on PR, If test passes
+      if: ${{ success() && github.event_name == 'pull_request' }} 
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.TOKEN }}
