@@ -42,7 +42,7 @@ jobs:
       run: |
         mkdir scripts
         cd ./scripts
-        echo "$DEPLOY_SH" > ./deploy.yml
+        echo "$DEPLOY_SH" > ./deploy.sh
         cd ..
         cd ./src/main/resources
         touch ./application.properties
