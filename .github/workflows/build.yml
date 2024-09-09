@@ -43,7 +43,6 @@ jobs:
     - name: Make application.properties
       run: |
         cd ./src/main
-        mkdir resources
         cd ./resources
         touch ./application.properties
         echo "$APPLICATION" > ./application.properties
@@ -56,3 +55,40 @@ jobs:
 
     - name: Gradle 빌드
       run: ./gradlew bootjar
+
+    # 빌드 실패 시 PR 닫기 및 변경 요청 추가
+    - name: Close PR, if build fails
+      if: ${{ failure() }}  # 이전 step이 실패한 경우에만 실행
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.TOKEN }}
+        script: | 
+          const pull_number = context.payload.pull_request.number;
+          const updated_title = `[BUILD FAIL] ${context.payload.pull_request.title}`;
+          await github.rest.pulls.createReview({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pull_number,
+            body: '빌드에 실패했습니다.😥 PR을 닫습니다.',
+            event: 'REQUEST_CHANGES'
+          });
+          await github.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pull_number,
+            title: updated_title,
+            state: 'closed'
+          });
+
+    - name: Comment on PR, If test passes
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.TOKEN }}
+        script: |
+          const pull_number = context.payload.pull_request.number;
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: pull_number,
+            body: '빌드에 성공했습니다.😊'
+          });
