@@ -2,7 +2,7 @@ package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Calendar;
 import com.fluffy.SharingCalendar.repository.CalendarRepository;
-import com.fluffy.SharingCalendar.dto.CalendarResponseDto;
+import com.fluffy.SharingCalendar.dto.response.CalendarResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
