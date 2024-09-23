@@ -32,6 +32,13 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public EventDto getEventDetails(int eventId) {
+        return eventRepository.findById(eventId)
+                .map(this::toEventDto)
+                .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
+    }
+
     private void validateCalendarExists(int calendarId) {
         if (!calendarRepository.existsById(calendarId)) {
             throw new IllegalArgumentException("캘린더를 찾을 수 없습니다.");
