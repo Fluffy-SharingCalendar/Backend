@@ -9,9 +9,9 @@ name: CI/CD - build
 
 on: 
   push:  
-    branches: ['dev']     
+    branches: ['develop']     
   pull_request: 
-    branches: ["main", "dev"]
+    branches: ["main", "develop","mvp"]
 
 permissions:  
   contents: read
