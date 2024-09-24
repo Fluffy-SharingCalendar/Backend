@@ -9,7 +9,7 @@ name: CI/CD - build
 
 on: 
   push:  
-    branches: ['develop']     
+    branches: ['develop', 'mvp']     
   pull_request: 
     branches: ["main", "develop","mvp"]
 
