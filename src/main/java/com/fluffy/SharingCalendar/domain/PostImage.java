@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -18,9 +19,12 @@ public class PostImage {
     @Column(name = "image_id")
     private int id;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "image_url", nullable = false, columnDefinition = "TEXT")
     private URL imageUrl;
 
     @Column(name = "post_id")
     private Integer postId;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

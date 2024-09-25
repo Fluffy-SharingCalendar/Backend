@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,14 @@ public class S3Service {
                 .orElseThrow(() -> new IllegalArgumentException("이미지가 존재하지 않습니다."));
         s3Repository.deleteFile(postImage.getImageUrl().getPath().substring(1));
         postImageRepository.delete(postImage);
+    }
+
+    @Transactional
+    public void deleteFiles(List<URL> imageUrls) {
+        List<String> keyNames = imageUrls.stream()
+                .map(url -> url.getPath().substring(1))
+                .toList();
+        s3Repository.deleteFiles(keyNames);
     }
 
     @Transactional
@@ -81,6 +90,7 @@ public class S3Service {
     private PostImage savePostImage(URL url) {
         PostImage postImage = PostImage.builder()
                 .imageUrl(url)
+                .createdAt(LocalDateTime.now())
                 .build();
         return postImageRepository.save(postImage);
     }

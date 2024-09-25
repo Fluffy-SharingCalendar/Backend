@@ -2,6 +2,7 @@ package com.fluffy.SharingCalendar.repository;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -35,5 +38,17 @@ public class S3Repository {
         }
 
         amazonS3Client.deleteObject(bucket, fileName);
+    }
+
+    public void deleteFiles(List<String> keyNames) {
+        List<DeleteObjectsRequest.KeyVersion> keys = keyNames.stream()
+                .map(DeleteObjectsRequest.KeyVersion::new)
+                .collect(Collectors.toList());
+
+        DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest(bucket)
+                .withKeys(keys)
+                .withQuiet(true);
+
+        amazonS3Client.deleteObjects(deleteRequest);
     }
 }
