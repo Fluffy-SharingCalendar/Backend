@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
         log.error("=======CustomException=======", ex);
         ErrorCode errorCode = ex.getErrorCode();
-        return ResponseEntity.status(errorCode.getHttpStatus()).body(ErrorResponse.toErrorResponse(errorCode));
+        return ResponseEntity.status(errorCode.getHttpStatus()).body(ErrorResponse.from(errorCode));
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)
