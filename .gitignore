@@ -38,3 +38,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# QueryDSL 관련 QClass 파일 무시
+/build/generated/**/Q*.java
+/src/main/generated/**/Q*.java
