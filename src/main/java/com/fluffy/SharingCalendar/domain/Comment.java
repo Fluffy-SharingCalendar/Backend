@@ -26,7 +26,7 @@ public class Comment {
     private Post post;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private Long authorId;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
@@ -42,13 +42,13 @@ public class Comment {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder
-    public Comment(Post post, Long userId, String content) {
+    public Comment(Post post, Long authorId, String content) {
         this.post = post;
-        this.userId = userId;
+        this.authorId = authorId;
         this.content = content;
     }
 
-    protected void update(String content) {
+    public void update(String content) {
         this.content = content;
     }
 }
