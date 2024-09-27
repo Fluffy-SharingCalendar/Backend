@@ -1,9 +1,9 @@
 package com.fluffy.SharingCalendar.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Entity
 @Table(name="mvp_user")
 public class User {

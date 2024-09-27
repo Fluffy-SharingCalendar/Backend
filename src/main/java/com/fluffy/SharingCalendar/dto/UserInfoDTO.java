@@ -1,8 +1,10 @@
 package com.fluffy.SharingCalendar.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
-@Data
+
+@Builder
 public class UserInfoDTO {
     private String nickname;
     private String phoneNumber;

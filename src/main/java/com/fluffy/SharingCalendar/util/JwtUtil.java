@@ -3,6 +3,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import com.fluffy.SharingCalendar.model.User;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Log4j2
 @Component
 public class JwtUtil {
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-
     @Value("${jwt.secret}")
     private String secret;
     private static final long JWT_TOKEN_VALIDITY_SECONDS = 60 * 60 * 12;

@@ -8,22 +8,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-
+@RequiredArgsConstructor
 @Log4j2
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
-    private UserService userService;
-
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
-        this.jwtUtil = jwtUtil;
-        this.userService = userService; // UserService 초기화
-    }
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -33,6 +29,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if ("POST".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().equals("/login")) {
             String body = request.getReader().lines().reduce("", (accumulator, actual) -> accumulator + actual);
             User user = new ObjectMapper().readValue(body, User.class);
+
+            // 닉네임 길이 유효성 검사
+            if (!userService.validateNickname(user.getNickname())) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 상태 400 설정
+                response.getWriter().write("닉네임은 1~25자 사이여야 합니다.");
+                return;
+            }
 
             // 닉네임 중복 확인
             if (userService.isNicknameAvailable(user.getNickname())) {
