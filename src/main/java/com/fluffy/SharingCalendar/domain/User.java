@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.model;
+package com.fluffy.SharingCalendar.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

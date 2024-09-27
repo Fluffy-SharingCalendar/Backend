@@ -1,12 +1,10 @@
 package com.fluffy.SharingCalendar.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import com.fluffy.SharingCalendar.model.User;
+import com.fluffy.SharingCalendar.domain.User;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

@@ -1,12 +1,14 @@
 package com.fluffy.SharingCalendar.service;
-import com.fluffy.SharingCalendar.dto.UserInfoDTO;
-import com.fluffy.SharingCalendar.model.User;
+import com.fluffy.SharingCalendar.dto.UserInfoDto;
+import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.repository.UserRepository;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.INVALID_NICKNAME;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.USER_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -20,31 +22,27 @@ public class UserService {
     }
 
     public boolean validateNickname(String nickname) {
-        return nickname.length() >= 1 && nickname.length() <= 25; // 1~25자 확인
+        if (nickname.length() < 1 || nickname.length() > 25) {
+            throw new CustomException(INVALID_NICKNAME);
+        }
+        return true;
     }
 
     public void save(User user) {
         userRepository.save(user);
     }
 
-    public User findByNickname(String nickname) {
-        Optional<User> userOptional = userRepository.findByNickname(nickname);
-        return userOptional.orElse(null);  // 사용자를 찾지 못하면 null 반환
-    }
-
-    public UserInfoDTO getUserInfo(String token) {
+    // 토큰으로 사용자 정보 얻어오기
+    public UserInfoDto getUserInfo(String token) {
         String nickname = jwtUtil.getNickname(token);
-        Optional<User> userOpt = userRepository.findByNickname(nickname);
+        User user = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            return UserInfoDTO.builder()
-                    .nickname(user.getNickname())
-                    .phoneNumber(user.getPhoneNumber())
-                    .profileImageIndex(user.getProfileImageIndex())
-                    .build();
-        }
-        return null; // 사용자 정보가 없을 경우 null 반환
+        return UserInfoDto.builder()
+                .nickname(user.getNickname())
+                .phoneNumber(user.getPhoneNumber())
+                .profileImageIndex(user.getProfileImageIndex())
+                .build();
     }
 
 

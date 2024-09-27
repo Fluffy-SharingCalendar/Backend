@@ -1,7 +1,9 @@
 package com.fluffy.SharingCalendar.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluffy.SharingCalendar.model.User;
+import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.exception.ErrorCode;
 import com.fluffy.SharingCalendar.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -32,25 +34,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 닉네임 길이 유효성 검사
             if (!userService.validateNickname(user.getNickname())) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);  // 상태 400 설정
-                response.getWriter().write("닉네임은 1~25자 사이여야 합니다.");
-                return;
+                throw new CustomException(ErrorCode.INVALID_NICKNAME);
             }
 
             // 닉네임 중복 확인
-            if (userService.isNicknameAvailable(user.getNickname())) {
-                userService.save(user);  // 사용자 저장
-                String token = jwtUtil.generateToken(user);  // 새로운 토큰 생성
-                log.info(token);
-
-                // 응답 헤더에 토큰 추가
-                response.setHeader("Authorization", "Bearer " + token);
-                response.setStatus(HttpServletResponse.SC_OK);  // 상태 200 설정
-            } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);  // 상태 409 설정
-                response.getWriter().write("이미 존재하는 아이디입니다.");
+            if (!userService.isNicknameAvailable(user.getNickname())) {
+                throw new CustomException(ErrorCode.ALREADY_SAVED_DISPLAY);
             }
-            return; // 더 이상 필터 체인에서 진행하지 않음
+
+            // 사용자 저장 및 토큰 생성
+            userService.save(user);
+            String token = jwtUtil.generateToken(user);
+            log.info("Generated Token: {}", token);
+
+            // 응답 헤더에 토큰 추가
+            response.setHeader("Authorization", "Bearer " + token);
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
         }
         filterChain.doFilter(request, response); // 다음 필터로 진행
 
