@@ -1,8 +1,9 @@
 package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Post;
-import com.fluffy.SharingCalendar.dto.PostDetailResponseDto;
-import com.fluffy.SharingCalendar.dto.PostRequest;
+import com.fluffy.SharingCalendar.dto.request.ModifyPostRequestDto;
+import com.fluffy.SharingCalendar.dto.response.PostDetailResponseDto;
+import com.fluffy.SharingCalendar.dto.request.RegisterPostRequestDto;
 import com.fluffy.SharingCalendar.repository.PostImageRepository;
 import com.fluffy.SharingCalendar.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +34,12 @@ class PostServiceTest {
     private PostImageRepository postImageRepository;
 
     int[] imageIds = {21, 22, 23};
-    PostRequest postRequest;
+    RegisterPostRequestDto postRequest;
     int userId = 1;
 
     @BeforeEach
     void setup() {
-        postRequest = PostRequest.builder()
+        postRequest = RegisterPostRequestDto.builder()
                 .eventId(1)
                 .content("test")
                 .imageIds(imageIds)
@@ -71,11 +72,10 @@ class PostServiceTest {
 
         //when
         int postId = post.getId();
-        PostRequest updateRequest = PostRequest.builder()
-                .eventId(1)
+        int[] imageIds = new int[] {};
+        ModifyPostRequestDto updateRequest = ModifyPostRequestDto.builder()
                 .content("test")
-                .imageIds(null)
-                .eventDate("2024.09.26")
+                .imageIds(imageIds)
                 .build();
 
         postService.update(updateRequest, postId, userId);
@@ -110,7 +110,7 @@ class PostServiceTest {
         //given
         Pageable pageable = PageRequest.of(0, 10);
         for (int i = 1; i <= 5; i++) {
-            PostRequest postRequest = PostRequest.builder()
+            RegisterPostRequestDto postRequest = RegisterPostRequestDto.builder()
                     .eventId(1)
                     .content("test" + i)
                     .imageIds(imageIds)

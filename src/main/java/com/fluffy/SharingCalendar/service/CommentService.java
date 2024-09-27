@@ -2,8 +2,8 @@ package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Comment;
 import com.fluffy.SharingCalendar.domain.Post;
-import com.fluffy.SharingCalendar.dto.CommentResponseDto;
-import com.fluffy.SharingCalendar.dto.RegisterCommentRequest;
+import com.fluffy.SharingCalendar.dto.response.CommentResponseDto;
+import com.fluffy.SharingCalendar.dto.request.RegisterCommentRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.repository.CommentRepository;
 import com.fluffy.SharingCalendar.repository.PostRepository;
@@ -26,7 +26,7 @@ public class CommentService {
     private final PostRepository postRepository;
 
     @Transactional
-    public void register(RegisterCommentRequest request, long authorId) {
+    public void register(RegisterCommentRequestDto request, long authorId) {
         /*
         사용자 검증
          */
@@ -38,7 +38,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> readCommentListByPostId(int postId) {
-        List<Comment> comments = commentRepository.findBYPostId(postId);
+        List<Comment> comments = commentRepository.findByPostId(postId);
         return comments.stream()
                 .map(CommentResponseDto::from)
                 .collect(Collectors.toList());

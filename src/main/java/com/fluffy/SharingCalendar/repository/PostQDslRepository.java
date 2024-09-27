@@ -1,7 +1,7 @@
 package com.fluffy.SharingCalendar.repository;
 
 import com.fluffy.SharingCalendar.dto.ImageDto;
-import com.fluffy.SharingCalendar.dto.PostDetailResponseDto;
+import com.fluffy.SharingCalendar.dto.response.PostDetailResponseDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

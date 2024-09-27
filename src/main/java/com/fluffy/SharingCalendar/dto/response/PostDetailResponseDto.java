@@ -1,5 +1,6 @@
-package com.fluffy.SharingCalendar.dto;
+package com.fluffy.SharingCalendar.dto.response;
 
+import com.fluffy.SharingCalendar.dto.ImageDto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 

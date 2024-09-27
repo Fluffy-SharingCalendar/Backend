@@ -1,8 +1,9 @@
 package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Post;
-import com.fluffy.SharingCalendar.dto.PostDetailResponseDto;
-import com.fluffy.SharingCalendar.dto.PostRequest;
+import com.fluffy.SharingCalendar.dto.request.ModifyPostRequestDto;
+import com.fluffy.SharingCalendar.dto.response.PostDetailResponseDto;
+import com.fluffy.SharingCalendar.dto.request.RegisterPostRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.repository.EventRepository;
 import com.fluffy.SharingCalendar.repository.PostImageRepository;
@@ -33,7 +34,7 @@ public class PostService {
     }
 
     @Transactional
-    public void register(PostRequest request, int userId) {
+    public void register(RegisterPostRequestDto request, int userId) {
         checkEventId(request.getEventId());
 
         Post post = request.toEntity(userId);
@@ -45,9 +46,7 @@ public class PostService {
 
 
     @Transactional
-    public void update(PostRequest request, int postId, int userId) {
-        checkEventId(request.getEventId());
-
+    public void update(ModifyPostRequestDto request, int postId, int userId) {
         Post post = findByPostId(postId);
 
         validateAccess(post.getAuthorId(), userId);

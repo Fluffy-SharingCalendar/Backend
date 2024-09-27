@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.dto;
+package com.fluffy.SharingCalendar.dto.response;
 
 import com.fluffy.SharingCalendar.domain.Comment;
 import lombok.Getter;
