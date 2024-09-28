@@ -2,6 +2,8 @@ package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Calendar;
 import com.fluffy.SharingCalendar.dto.response.CalendarResponseDto;
+import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.exception.ErrorCode;
 import com.fluffy.SharingCalendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.util.ConstantUtil;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
+
+import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class CalendarService {
     public CalendarResponseDto findCalendarById(int calendarId) {
         return calendarRepository.findById(calendarId)
                 .map(this::convertDto)
-                .orElseThrow(() -> new IllegalArgumentException("캘린더를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
     }
 
     private CalendarResponseDto convertDto(Calendar calendar) {

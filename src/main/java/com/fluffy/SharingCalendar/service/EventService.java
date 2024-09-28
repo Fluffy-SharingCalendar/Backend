@@ -3,6 +3,8 @@ package com.fluffy.SharingCalendar.service;
 import com.fluffy.SharingCalendar.domain.Event;
 import com.fluffy.SharingCalendar.dto.EventDto;
 import com.fluffy.SharingCalendar.dto.response.EventDetailResponseDto;
+import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.exception.ErrorCode;
 import com.fluffy.SharingCalendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.repository.EventQDslRepository;
 import com.fluffy.SharingCalendar.repository.EventRepository;
@@ -15,6 +17,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.EVENT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +48,7 @@ public class EventService {
     public EventDetailResponseDto getEventDetails(int eventId) {
         EventDto eventDto = eventRepository.findById(eventId)
                 .map(this::toEventDto)
-                .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(EVENT_NOT_FOUND));
 
         URL url = getRandomImageForEvent(eventId);
 
@@ -63,7 +68,7 @@ public class EventService {
 
     private void validateCalendarExists(int calendarId) {
         if (!calendarRepository.existsById(calendarId)) {
-            throw new IllegalArgumentException("캘린더를 찾을 수 없습니다.");
+            throw new CustomException(CALENDAR_NOT_FOUND);
         }
     }
 

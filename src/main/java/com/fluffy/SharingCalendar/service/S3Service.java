@@ -3,6 +3,8 @@ package com.fluffy.SharingCalendar.service;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fluffy.SharingCalendar.domain.PostImage;
 import com.fluffy.SharingCalendar.dto.ImageDto;
+import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.exception.ErrorCode;
 import com.fluffy.SharingCalendar.repository.PostImageRepository;
 import com.fluffy.SharingCalendar.repository.S3Repository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -33,7 +37,7 @@ public class S3Service {
     @Transactional
     public void delete(int imageId) {
         PostImage postImage = postImageRepository.findById(imageId)
-                .orElseThrow(() -> new IllegalArgumentException("이미지가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
         s3Repository.deleteFile(postImage.getImageUrl().getPath().substring(1));
         postImageRepository.delete(postImage);
     }
@@ -57,7 +61,7 @@ public class S3Service {
 
             return toImageDto(postImage);
         } catch (IOException e) {
-            throw new IllegalArgumentException("파일 전송에 실패했습니다.", e);
+            throw new CustomException(UNSUCCESSFUL_UPLOAD);
         }
     }
 
@@ -65,7 +69,7 @@ public class S3Service {
         String extension = extractExtension(file.getOriginalFilename());
 
         if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
-            throw new IllegalArgumentException("파일 확장자는 jpg, jpeg, png만 가능합니다.");
+            throw new CustomException(INVALID_EXTENSION);
         }
 
         ObjectMetadata metadata = new ObjectMetadata();
@@ -84,7 +88,7 @@ public class S3Service {
         return Optional.ofNullable(fileName)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(fileName.lastIndexOf(".") + 1))
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 파일 형식입니다."));
+                .orElseThrow(() -> new CustomException(INVALID_EXTENSION));
     }
 
     private PostImage savePostImage(URL url) {
