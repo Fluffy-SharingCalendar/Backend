@@ -18,7 +18,7 @@ public class CommentResponseDto {
     private final String content;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private final LocalDateTime createAt;
+    private final LocalDateTime createdAt;
 
     public CommentResponseDto(Comment comment) {
         User author = comment.getAuthor();
@@ -27,6 +27,6 @@ public class CommentResponseDto {
         this.authorNickname = author.getNickname();
         this.authorProfileNo = author.getProfileImageIndex();
         this.content = comment.getContent();
-        this.createAt = comment.getCreatedAt();
+        this.createdAt = comment.getCreatedAt();
     }
 }

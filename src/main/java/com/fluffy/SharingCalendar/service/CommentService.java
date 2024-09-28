@@ -23,12 +23,12 @@ import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final PostService postService;
     private final UserService userService;
 
     @Transactional
     public void register(int postId, CommentRequestDto request, String nickname) {
-        Post post = findPostById(postId);
+        Post post = postService.findByPostId(postId);
         User user = userService.findByNickname(nickname);
 
         Comment comment = request.toEntity(post, user);
@@ -38,7 +38,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> readCommentListByPostId(int postId) {
-        findPostById(postId);
+        postService.findByPostId(postId);
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
         return comments.stream()
                 .map(CommentResponseDto::new)
@@ -64,12 +64,6 @@ public class CommentService {
         validateAccess(comment.getAuthor().getId(), user.getId());
 
         commentRepository.delete(comment);
-    }
-
-    @Transactional(readOnly = true)
-    public Post findPostById(int postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
