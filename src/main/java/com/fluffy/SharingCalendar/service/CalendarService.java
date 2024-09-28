@@ -1,21 +1,23 @@
 package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Calendar;
-import com.fluffy.SharingCalendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.dto.response.CalendarResponseDto;
+import com.fluffy.SharingCalendar.repository.CalendarRepository;
+import com.fluffy.SharingCalendar.util.ConstantUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
+
 @Service
 @RequiredArgsConstructor
 public class CalendarService {
 
+    public static final URL DEFAULT_PROFILE_IMAGE_URL = ConstantUtil.getRandomDefaultImageUrl();
     @Autowired
     private final CalendarRepository calendarRepository;
-
-    private static final String DEFAULT_PROFILE_IMAGE_URL = "defaultProfileImageUrl";
 
     public Calendar saveCalendar(Calendar calendar) {
         return calendarRepository.save(calendar);
@@ -31,7 +33,7 @@ public class CalendarService {
     private CalendarResponseDto convertDto(Calendar calendar) {
         return CalendarResponseDto.builder()
                 .name(calendar.getName())
-                .profileImageUrl(calendar.getProfileImageUrl() != null ? calendar.getProfileImageUrl() : DEFAULT_PROFILE_IMAGE_URL)
+                .profileImageUrl(calendar.getProfileImageUrl() != null ? calendar.getProfileImageUrl() : String.valueOf(DEFAULT_PROFILE_IMAGE_URL))
                 .backgroundImage(calendar.getBackgroundImageUrl())
                 .build();
     }
