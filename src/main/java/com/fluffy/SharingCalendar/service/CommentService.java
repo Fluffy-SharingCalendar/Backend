@@ -2,8 +2,9 @@ package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Comment;
 import com.fluffy.SharingCalendar.domain.Post;
+import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.dto.request.CommentRequestDto;
 import com.fluffy.SharingCalendar.dto.response.CommentResponseDto;
-import com.fluffy.SharingCalendar.dto.request.RegisterCommentRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.repository.CommentRepository;
 import com.fluffy.SharingCalendar.repository.PostRepository;
@@ -14,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.fluffy.SharingCalendar.exception.ErrorCode.COMMENT_NOT_FOUND;
-import static com.fluffy.SharingCalendar.exception.ErrorCode.POST_NOT_FOUND;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,42 +24,45 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final UserService userService;
 
     @Transactional
-    public void register(RegisterCommentRequestDto request, long authorId) {
-        /*
-        사용자 검증
-         */
-        Post post = findPostById(request.getPostId());
-        Comment comment = request.toEntity(post, authorId);
+    public void register(int postId, CommentRequestDto request, String nickname) {
+        Post post = findPostById(postId);
+        User user = userService.findByNickname(nickname);
+
+        Comment comment = request.toEntity(post, user);
 
         commentRepository.save(comment);
     }
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> readCommentListByPostId(int postId) {
-        List<Comment> comments = commentRepository.findByPostId(postId);
+        findPostById(postId);
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
         return comments.stream()
-                .map(CommentResponseDto::from)
+                .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void update(int commentId, String content) {
-        /*
-        사용자 검증
-         */
+    public void update(int commentId, String content, String nickname) {
         Comment comment = findCommentById(commentId);
+        User user = userService.findByNickname(nickname);
+
+        validateAccess(comment.getAuthor().getId(), user.getId());
+
         comment.update(content);
         commentRepository.save(comment);
     }
 
     @Transactional
-    public void delete(int commentId) {
-        /*
-        사용자 검증
-         */
+    public void delete(int commentId, String nickname) {
         Comment comment = findCommentById(commentId);
+        User user = userService.findByNickname(nickname);
+
+        validateAccess(comment.getAuthor().getId(), user.getId());
+
         commentRepository.delete(comment);
     }
 
@@ -73,5 +76,11 @@ public class CommentService {
     public Comment findCommentById(int commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+    }
+
+    private void validateAccess(long registerId, long userId) {
+        if (registerId != userId) {
+            throw new CustomException(NO_PERMISSION_FOR_MODIFICATION);
+        }
     }
 }
