@@ -1,9 +1,10 @@
-package com.fluffy.SharingCalendar.dto.response;
+package com.fluffy.SharingCalendar.dto;
 
-import com.fluffy.SharingCalendar.dto.ImageDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -11,18 +12,21 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-public class PostDetailResponseDto {
-    private int postId;
-    private int authorId;
+public class PostDetail {
+    private Integer postId;
+    private Long authorId;
     private String authorNickname;
-    private int authorProfileImageNo;
+    private Integer authorProfileImageNo;
     private List<ImageDto> urls;
     private String content;
-    private String eventDate;
-    private int commentCnt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+    private LocalDate eventDate;
+
+    private Integer commentCnt;
 
     @QueryProjection
-    public PostDetailResponseDto(Integer postId, Integer authorId, String authorNickname, Integer authorProfileImageNo, String content, String eventDate, Integer commentCnt) {
+    public PostDetail(Integer postId, Long authorId, String authorNickname, Integer authorProfileImageNo, String content, LocalDate eventDate, Integer commentCnt) {
         this.postId = postId;
         this.authorId = authorId;
         this.authorNickname = authorNickname;

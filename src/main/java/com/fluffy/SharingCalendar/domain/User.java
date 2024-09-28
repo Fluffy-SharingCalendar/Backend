@@ -1,15 +1,22 @@
 package com.fluffy.SharingCalendar.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name="mvp_user")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "mvp_user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long user_id;
+    @Column(name = "user_id")
+    private long id;
 
     @Column(name = "nickname")
     private String nickname;

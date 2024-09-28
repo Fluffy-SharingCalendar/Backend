@@ -1,16 +1,16 @@
 package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Post;
+import com.fluffy.SharingCalendar.domain.User;
 import com.fluffy.SharingCalendar.dto.request.ModifyPostRequestDto;
-import com.fluffy.SharingCalendar.dto.response.PostDetailResponseDto;
 import com.fluffy.SharingCalendar.dto.request.RegisterPostRequestDto;
+import com.fluffy.SharingCalendar.dto.response.PagedPostResponse;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.repository.EventRepository;
 import com.fluffy.SharingCalendar.repository.PostImageRepository;
 import com.fluffy.SharingCalendar.repository.PostQDslRepository;
 import com.fluffy.SharingCalendar.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,29 +27,31 @@ public class PostService {
     private final PostQDslRepository postQDslRepository;
     private final EventRepository eventRepository;
     private final PostImageRepository postImageRepository;
+    private final UserService userService;
 
     @Transactional
-    public Page<PostDetailResponseDto> readPostList(Pageable page) {
-        return postQDslRepository.findPostList(page);
-    }
+    public void register(int eventId, RegisterPostRequestDto request, String nickname) {
+        checkEventId(eventId);
 
-    @Transactional
-    public void register(RegisterPostRequestDto request, int userId) {
-        checkEventId(request.getEventId());
+        User user = userService.findByNickname(nickname);
 
-        Post post = request.toEntity(userId);
+        Post post = request.toEntity(user, eventId);
 
         postRepository.save(post);
 
         updateImageByPostId(request.getImageIds(), post.getId());
     }
 
+    @Transactional(readOnly = true)
+    public PagedPostResponse readPostList(int eventId, Pageable page) {
+        return new PagedPostResponse(postQDslRepository.findPostList(eventId, page));
+    }
 
     @Transactional
-    public void update(ModifyPostRequestDto request, int postId, int userId) {
+    public void update(int postId, ModifyPostRequestDto request, String nickname) {
         Post post = findByPostId(postId);
-
-        validateAccess(post.getAuthorId(), userId);
+        User user = userService.findByNickname(nickname);
+        validateAccess(post.getAuthor().getId(), user.getId());
 
         post.update(request.getContent());
 
@@ -60,10 +62,13 @@ public class PostService {
     }
 
     @Transactional
-    public void delete(int postId, int userId) {
+    public void delete(int postId, String nickname) {
         Post post = findByPostId(postId);
-        validateAccess(post.getAuthorId(), userId);
+        User user = userService.findByNickname(nickname);
+        validateAccess(post.getAuthor().getId(), user.getId());
+
         postImageRepository.updateAllByPostId(postId);
+
         postRepository.delete(post);
     }
 
@@ -83,7 +88,7 @@ public class PostService {
         postImageRepository.updateAllByPostId(postId);
     }
 
-    private void validateAccess(int registerId, int userId) {
+    private void validateAccess(long registerId, long userId) {
         if (registerId != userId) {
             throw new CustomException(NO_PERMISSION_FOR_MODIFICATION);
         }

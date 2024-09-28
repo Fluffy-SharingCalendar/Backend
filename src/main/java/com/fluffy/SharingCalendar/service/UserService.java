@@ -1,11 +1,13 @@
 package com.fluffy.SharingCalendar.service;
-import com.fluffy.SharingCalendar.dto.UserInfoDto;
+
 import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.dto.UserInfoDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.repository.UserRepository;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.fluffy.SharingCalendar.exception.ErrorCode.INVALID_NICKNAME;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.USER_NOT_FOUND;
@@ -32,6 +34,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public User findByNickname(String nickName) {
+        return userRepository.findByNickname(nickName)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
     // 토큰으로 사용자 정보 얻어오기
     public UserInfoDto getUserInfo(String token) {
         String nickname = jwtUtil.getNickname(token);
@@ -44,9 +52,6 @@ public class UserService {
                 .profileImageIndex(user.getProfileImageIndex())
                 .build();
     }
-
-
-
 
 
 }
