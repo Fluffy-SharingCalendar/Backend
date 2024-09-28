@@ -12,9 +12,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -52,6 +55,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
+
+        // 로그인 요청이 아닌 경우 JWT 토큰 검증
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7); // "Bearer " 이후의 토큰만 추출
+            try {
+                // JWT 토큰 검증
+                if (jwtUtil.isTokenValid(token)) {
+                    String username = jwtUtil.getNickname(token);
+                    User user = userService.findByNickname(username); // 토큰에서 사용자 정보 추출 및 로드
+                    // SecurityContextHolder에 인증 정보 설정
+                    SecurityContextHolder.getContext().setAuthentication(
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, Collections.emptyList()));
+                }
+            } catch (Exception e) {
+                log.error("JWT 토큰 검증 실패: {}", e.getMessage());
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid Token");
+                return;
+            }
+        }
+
         filterChain.doFilter(request, response); // 다음 필터로 진행
 
     }

@@ -1,7 +1,8 @@
 package com.fluffy.SharingCalendar.util;
+
+import com.fluffy.SharingCalendar.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import com.fluffy.SharingCalendar.domain.User;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,9 +15,9 @@ import java.util.Date;
 @Log4j2
 @Component
 public class JwtUtil {
+    private static final long JWT_TOKEN_VALIDITY_SECONDS = 60 * 60 * 12;
     @Value("${jwt.secret}")
     private String secret;
-    private static final long JWT_TOKEN_VALIDITY_SECONDS = 60 * 60 * 12;
 
     public String generateToken(User user) {
         String token = Jwts.builder()
@@ -33,6 +34,10 @@ public class JwtUtil {
     }
 
     public String getNickname(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7); // "Bearer " 문자열 이후의 토큰만 추출
+        }
+
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
@@ -44,7 +49,7 @@ public class JwtUtil {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
