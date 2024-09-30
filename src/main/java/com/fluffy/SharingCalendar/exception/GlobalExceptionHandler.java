@@ -1,5 +1,6 @@
 package com.fluffy.SharingCalendar.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({Exception.class, RuntimeException.class})
-    protected ResponseEntity<ErrorResponse> catchException(RuntimeException ex) {
+    protected ResponseEntity<ErrorResponse> catchException(RuntimeException ex, HttpServletRequest request) {
         log.error("========예외========", ex);
         ErrorResponse response = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
         return ResponseEntity.internalServerError().body(response);
