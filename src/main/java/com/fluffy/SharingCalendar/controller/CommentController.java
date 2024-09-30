@@ -6,6 +6,7 @@ import com.fluffy.SharingCalendar.service.CommentService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class CommentController {
     @PostMapping("/{postId}")
     public ResponseEntity<Void> register(@PathVariable Integer postId,
                                          @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                         @RequestBody CommentRequestDto request) {
+                                         @Validated @RequestBody CommentRequestDto request) {
         commentService.register(postId, request, jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
     }
@@ -35,7 +36,7 @@ public class CommentController {
     @PatchMapping("/{commentId}")
     public ResponseEntity<Void> modify(@PathVariable Integer commentId,
                                        @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                       @RequestBody CommentRequestDto request) {
+                                       @Validated @RequestBody CommentRequestDto request) {
         commentService.update(commentId, request.getContent(), jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
     }
