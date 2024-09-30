@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @RestController
@@ -15,6 +17,6 @@ public class UserController {
     @PostMapping("/validation")
     public ResponseEntity<?> isNicknameAvailable(@RequestBody CheckNicknameRequestDto requestDto) {
         userService.checkNickname(requestDto.getNickname());
-        return ResponseEntity.ok("사용 가능한 닉네임입니다.");
+        return ResponseEntity.ok(Collections.singletonMap("message", "사용 가능한 닉네임입니다."));
     }
 }
