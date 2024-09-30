@@ -9,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.fluffy.SharingCalendar.exception.ErrorCode.INVALID_NICKNAME;
-import static com.fluffy.SharingCalendar.exception.ErrorCode.USER_NOT_FOUND;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -19,8 +18,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public boolean isNicknameAvailable(String nickname) {
-        return !userRepository.existsByNickname(nickname);
+    public boolean checkNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new CustomException(ALREADY_SAVED_DISPLAY);
+        }
+        return true;
     }
 
     public boolean validateNickname(String nickname) {
@@ -35,8 +37,8 @@ public class UserService {
     }
 
     @Transactional
-    public User findByNickname(String nickName) {
-        return userRepository.findByNickname(nickName)
+    public User findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
