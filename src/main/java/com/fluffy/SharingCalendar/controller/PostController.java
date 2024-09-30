@@ -8,8 +8,10 @@ import com.fluffy.SharingCalendar.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,11 +21,26 @@ public class PostController {
     private final PostService postService;
     private final JwtUtil jwtUtil;
 
-    @PostMapping("/{eventId}")
+    /*
+    이미지 분리 등록
+     */
+//    @PostMapping("/{eventId}")
+//    public ResponseEntity<Void> register(@PathVariable Integer eventId,
+//                                         @RequestHeader(value = "Authorization", required = false) String accessToken,
+//                                         @RequestBody RegisterPostRequestDto request) {
+//        postService.register(eventId, request, jwtUtil.getNickname(accessToken));
+//        return ResponseEntity.noContent().build();
+//    }
+
+    /*
+    이미지 동시 등록
+     */
+    @PostMapping(value = "/{eventId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> register(@PathVariable Integer eventId,
                                          @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                         @RequestBody RegisterPostRequestDto request) {
-        postService.register(eventId, request, jwtUtil.getNickname(accessToken));
+                                         @RequestPart(value = "post") RegisterPostRequestDto request,
+                                         @RequestPart(value = "file", required = false) MultipartFile[] files) {
+        postService.register(eventId, request, files, jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
     }
 
@@ -37,11 +54,26 @@ public class PostController {
         return ResponseEntity.ok(postService.readPostList(eventId, pageable));
     }
 
-    @PatchMapping("/{postId}")
+    /*
+    이미지 분리 수정
+     */
+//    @PatchMapping("/{postId}")
+//    public ResponseEntity<Void> modify(@PathVariable Integer postId,
+//                                       @RequestHeader(value = "Authorization", required = false) String accessToken,
+//                                       @RequestBody ModifyPostRequestDto request) {
+//        postService.update(postId, request, jwtUtil.getNickname(accessToken));
+//        return ResponseEntity.noContent().build();
+//    }
+
+    /*
+    이미지 동시 수정
+     */
+    @PatchMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> modify(@PathVariable Integer postId,
                                        @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                       @RequestBody ModifyPostRequestDto request) {
-        postService.update(postId, request, jwtUtil.getNickname(accessToken));
+                                       @RequestPart(value = "post") ModifyPostRequestDto request,
+                                       @RequestPart(value = "file", required = false) MultipartFile[] files) {
+        postService.update(postId, request, files, jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
     }
 

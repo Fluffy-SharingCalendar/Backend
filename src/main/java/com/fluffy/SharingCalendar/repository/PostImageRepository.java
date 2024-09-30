@@ -21,4 +21,6 @@ public interface PostImageRepository extends JpaRepository<PostImage, Integer> {
     @Modifying(clearAutomatically = true)
     @Query("update PostImage p set p.postId=null where p.postId = :postId")
     void updateAllByPostId(@Param("postId") Integer postId);
+
+    void deleteByPostId(int postId);
 }
