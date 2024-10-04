@@ -25,7 +25,7 @@ public class SchedulerService {
     private final S3Service s3Service;
     private final PostImageRepository postImageRepository;
 
-    @Scheduled(cron = "* * 3 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
     @Transactional
     public void deleteImages() {
         log.info("========== 이미지 삭제 스케줄러 실행 ==========");
