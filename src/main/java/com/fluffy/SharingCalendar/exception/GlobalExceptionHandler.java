@@ -43,8 +43,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler({Exception.class, RuntimeException.class})
-    protected ResponseEntity<ErrorResponse> catchException(RuntimeException ex, HttpServletRequest request) {
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<ErrorResponse> catchException(Exception ex) {
         log.error("========예외========", ex);
         ErrorResponse response = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
         return ResponseEntity.internalServerError().body(response);
