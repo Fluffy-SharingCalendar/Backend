@@ -8,6 +8,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.List;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler({MaxUploadSizeExceededException.class})
+    protected ResponseEntity<ErrorResponse> handleMultipartException(MaxUploadSizeExceededException e) {
+        log.error("handleMaxUploadSizeExceededException", e);
+        final ErrorResponse response = ErrorResponse.from(ErrorCode.MAX_FILE_SIZE_EXCEEDED);
+        return ResponseEntity.status(413).body(response);
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)

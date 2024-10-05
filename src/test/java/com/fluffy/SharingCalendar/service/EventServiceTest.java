@@ -2,6 +2,7 @@ package com.fluffy.SharingCalendar.service;
 
 import com.fluffy.SharingCalendar.domain.Event;
 import com.fluffy.SharingCalendar.dto.EventDto;
+import com.fluffy.SharingCalendar.dto.response.EventDetailResponseDto;
 import com.fluffy.SharingCalendar.repository.CalendarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,8 +32,8 @@ class EventServiceTest {
         testEvent = Event.builder()
                 .title("test")
                 .color("#FF5733")
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now().plusDays(1))
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(1))
                 .calendar(calendarRepository.findById(1).orElseThrow(() -> new IllegalArgumentException("캘린더가 존재하지 않습니다.")))
                 .build();
     }
@@ -55,7 +56,7 @@ class EventServiceTest {
         Event savedEvent = eventService.saveEvent(testEvent);
 
         //when
-        EventDto eventDetails = eventService.getEventDetails(savedEvent.getEventId());
+        EventDetailResponseDto eventDetails = eventService.getEventDetails(savedEvent.getEventId());
 
         //then
         assertEquals(savedEvent.getTitle(), eventDetails.getTitle());
