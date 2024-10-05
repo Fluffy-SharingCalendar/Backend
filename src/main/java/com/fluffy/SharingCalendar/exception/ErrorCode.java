@@ -29,6 +29,9 @@ public enum ErrorCode {
     /* 409 CONFLICT 중복된 리소스 */
     ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 닉네임입니다."),
 
+    /* 413 Request Entity Too Large */
+    MAX_FILE_SIZE_EXCEEDED(PAYLOAD_TOO_LARGE, "이미지 파일은 10MB이하여야합니다."),
+
     /* 500 INTERNAL SERVER ERROR */
     UNSUCCESSFUL_UPLOAD(INTERNAL_SERVER_ERROR, "이미지 파일 업로드에 실패했습니다."),
     SERVER_ERROR(INTERNAL_SERVER_ERROR, "서버 에러입니다. 관리자 이메일로 연락주세요!");
