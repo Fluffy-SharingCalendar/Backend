@@ -52,6 +52,7 @@ public class PostQDslRepository {
         long total = query
                 .select(post.count())
                 .from(post)
+                .where(post.eventId.eq(eventId))
                 .fetchOne();
 
         return new PageImpl<>(postList, pageable, total);
