@@ -1,5 +1,6 @@
 package com.fluffy.SharingCalendar.repository;
 
+import com.fluffy.SharingCalendar.domain.Post;
 import com.fluffy.SharingCalendar.dto.ImageDto;
 import com.fluffy.SharingCalendar.dto.PostDetail;
 import com.querydsl.core.types.Projections;
@@ -71,4 +72,20 @@ public class PostQDslRepository {
                 .fetch();
     }
 
+    public long findPostIndexByPaging(Post createdPost) {
+        return query
+                .select(post.count())
+                .from(post)
+                .where(post.eventId.eq(createdPost.getEventId())
+                        .and(
+                                post.eventDate.gt(createdPost.getEventDate())
+                                        .or(
+                                                post.eventDate.eq(createdPost.getEventDate())
+                                                        .and(post.createdAt.gt(createdPost.getCreatedAt()))
+                                        )
+                        )
+                        .and(post.id.ne(createdPost.getId()))
+                )
+                .fetchOne();
+    }
 }

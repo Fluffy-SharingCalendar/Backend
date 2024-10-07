@@ -37,12 +37,13 @@ public class PostController {
     이미지 동시 등록
      */
     @PostMapping(value = "/{eventId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Void> register(@PathVariable Integer eventId,
+    public ResponseEntity<Long> register(@PathVariable Integer eventId,
                                          @RequestHeader(value = "Authorization", required = false) String accessToken,
                                          @Validated @RequestPart(value = "post") RegisterPostRequestDto request,
                                          @RequestPart(value = "file", required = false) MultipartFile[] files) {
-        postService.register(eventId, request, files, jwtUtil.getNickname(accessToken));
-        return ResponseEntity.noContent().build();
+        String nickname = jwtUtil.getNickname(accessToken);
+        long postIndex = postService.register(eventId, request, files, nickname);
+        return ResponseEntity.ok(postIndex);
     }
 
     @GetMapping("/{eventId}")
@@ -72,7 +73,7 @@ public class PostController {
     @PatchMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> modify(@PathVariable Integer postId,
                                        @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                       @Validated  @RequestPart(value = "post") ModifyPostRequestDto request,
+                                       @Validated @RequestPart(value = "post") ModifyPostRequestDto request,
                                        @RequestPart(value = "file", required = false) MultipartFile[] files) {
         postService.update(postId, request, files, jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
