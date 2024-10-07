@@ -51,7 +51,7 @@ public class PostService {
     이미지 동시 게시글 등록
      */
     @Transactional
-    public void register(int eventId, RegisterPostRequestDto request, MultipartFile[] files, String nickname) {
+    public long register(int eventId, RegisterPostRequestDto request, MultipartFile[] files, String nickname) {
         checkEventId(eventId);
 
         User user = userService.findByNickname(nickname);
@@ -63,6 +63,9 @@ public class PostService {
                 s3Service.upload(files[i], post.getId(), i + 1);
             });
         }
+
+        // 게시글이 전체 목록에서 몇 번째 위치인지 계산
+        return postQDslRepository.findPostIndexByPaging(post);
     }
 
     @Transactional(readOnly = true)
@@ -120,8 +123,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Post findByPostId(int postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+        return postRepository.findById(postId).orElseThrow(() -> new CustomException(POST_NOT_FOUND));
     }
 
     /*
