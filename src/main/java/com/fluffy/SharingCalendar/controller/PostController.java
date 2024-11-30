@@ -8,11 +8,17 @@ import com.fluffy.SharingCalendar.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,27 +28,11 @@ public class PostController {
     private final PostService postService;
     private final JwtUtil jwtUtil;
 
-    /*
-    이미지 분리 등록
-     */
-//    @PostMapping("/{eventId}")
-//    public ResponseEntity<Void> register(@PathVariable Integer eventId,
-//                                         @RequestHeader(value = "Authorization", required = false) String accessToken,
-//                                         @RequestBody RegisterPostRequestDto request) {
-//        postService.register(eventId, request, jwtUtil.getNickname(accessToken));
-//        return ResponseEntity.noContent().build();
-//    }
-
-    /*
-    이미지 동시 등록
-     */
-    @PostMapping(value = "/{eventId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping("/{eventId}")
     public ResponseEntity<Long> register(@PathVariable Integer eventId,
-                                         @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                         @Validated @RequestPart(value = "post") RegisterPostRequestDto request,
-                                         @RequestPart(value = "file", required = false) MultipartFile[] files) {
-        String nickname = jwtUtil.getNickname(accessToken);
-        long postIndex = postService.register(eventId, request, files, nickname);
+            @RequestHeader(value = "Authorization", required = false) String accessToken,
+            @RequestBody RegisterPostRequestDto request) {
+        long postIndex = postService.register(eventId, request, jwtUtil.getNickname(accessToken));
         return ResponseEntity.ok(postIndex);
     }
 
@@ -56,32 +46,17 @@ public class PostController {
         return ResponseEntity.ok(postService.readPostList(eventId, pageable));
     }
 
-    /*
-    이미지 분리 수정
-     */
-//    @PatchMapping("/{postId}")
-//    public ResponseEntity<Void> modify(@PathVariable Integer postId,
-//                                       @RequestHeader(value = "Authorization", required = false) String accessToken,
-//                                       @RequestBody ModifyPostRequestDto request) {
-//        postService.update(postId, request, jwtUtil.getNickname(accessToken));
-//        return ResponseEntity.noContent().build();
-//    }
-
-    /*
-    이미지 동시 수정
-     */
-    @PatchMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping("/{postId}")
     public ResponseEntity<Void> modify(@PathVariable Integer postId,
-                                       @RequestHeader(value = "Authorization", required = false) String accessToken,
-                                       @Validated @RequestPart(value = "post") ModifyPostRequestDto request,
-                                       @RequestPart(value = "file", required = false) MultipartFile[] files) {
-        postService.update(postId, request, files, jwtUtil.getNickname(accessToken));
+            @RequestHeader(value = "Authorization", required = false) String accessToken,
+            @RequestBody ModifyPostRequestDto request) {
+        postService.update(postId, request, jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> delete(@PathVariable Integer postId,
-                                       @RequestHeader(value = "Authorization", required = false) String accessToken) {
+            @RequestHeader(value = "Authorization", required = false) String accessToken) {
         postService.delete(postId, jwtUtil.getNickname(accessToken));
         return ResponseEntity.noContent().build();
     }

@@ -22,6 +22,8 @@ public class RegisterPostRequestDto {
     @NotBlank(message = "내용을 입력해 주세요.")
     private String content;
 
+    private int[] imageIds;
+
     public Post toEntity(User user, int eventId) {
         return Post.builder()
                 .eventId(eventId)

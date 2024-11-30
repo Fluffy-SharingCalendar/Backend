@@ -46,35 +46,14 @@ public class S3Service {
         s3Repository.deleteFiles(keyNames);
     }
 
-    /*
-    이미지 분리 게시글 등록
-     */
-//    @Transactional
-//    public ImageDto upload(MultipartFile file) {
-//        try (InputStream inputStream = file.getInputStream()) {
-//            String fileName = createFileName(file.getOriginalFilename());
-//            ObjectMetadata metadata = createObjectMetadata(file);
-//
-//            URL responseUrl = s3Repository.uploadFile(metadata, inputStream, POST_PATH + fileName);
-//            PostImage postImage = savePostImage(responseUrl);
-//
-//            return toImageDto(postImage);
-//        } catch (IOException e) {
-//            throw new CustomException(UNSUCCESSFUL_UPLOAD);
-//        }
-//    }
-
-    /*
-        이미지 동시 게시글 등록
-     */
     @Transactional
-    public ImageDto upload(MultipartFile file, int postId, int sortOrder) { // sortOrder를 추가로 받음
+    public ImageDto upload(MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
             String fileName = createFileName(file.getOriginalFilename());
             ObjectMetadata metadata = createObjectMetadata(file);
 
             URL responseUrl = s3Repository.uploadFile(metadata, inputStream, POST_PATH + fileName);
-            PostImage postImage = savePostImage(responseUrl, postId, sortOrder);
+            PostImage postImage = savePostImage(responseUrl);
 
             return toImageDto(postImage);
         } catch (IOException e) {
@@ -105,22 +84,10 @@ public class S3Service {
         return Optional.ofNullable(fileName).filter(f -> f.contains(".")).map(f -> f.substring(fileName.lastIndexOf(".") + 1)).orElseThrow(() -> new CustomException(INVALID_EXTENSION));
     }
 
-    /*
-    게시글 이미지 분리 등록
-     */
-//    private PostImage savePostImage(URL url) {
-//        PostImage postImage = PostImage.builder()
-//                .imageUrl(url)
-//                .createdAt(LocalDateTime.now())
-//                .build();
-//        return postImageRepository.save(postImage);
-//    }
-
-    /*
-    게시글 이미지 동시 등록
-     */
-    private PostImage savePostImage(URL url, int postId, int sortOrder) { // sortOrder 값을 포함하여 저장
-        PostImage postImage = PostImage.builder().imageUrl(url).createdAt(LocalDateTime.now()).postId(postId).sort(sortOrder) // sortOrder 값을 설정
+    private PostImage savePostImage(URL url) {
+        PostImage postImage = PostImage.builder()
+                .imageUrl(url)
+                .createdAt(LocalDateTime.now())
                 .build();
         return postImageRepository.save(postImage);
     }
