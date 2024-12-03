@@ -32,9 +32,12 @@ public class S3Config {
         return AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
     }
 
+    /*
+    추후 기본 이미지 url이 결정되면 수정 필요
+     */
     public static URL getDefaultImage() {
         try {
-            return new URL("temp-url");
+            return new URL("https://temp-url");
         } catch (MalformedURLException e) {
             throw new CustomException(SERVER_ERROR);
         }

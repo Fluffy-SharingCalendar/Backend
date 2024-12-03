@@ -1,11 +1,9 @@
-package com.fluffy.SharingCalendar.memory.service;
+package com.fluffy.SharingCalendar.image;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fluffy.SharingCalendar.memory.domain.PostImage;
-import com.fluffy.SharingCalendar.memory.dto.ImageDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.memory.repository.PostImageRepository;
-import com.fluffy.SharingCalendar.memory.repository.S3Repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -28,6 +26,7 @@ import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
 @Log4j2
 public class S3Service {
 
+    private static final String PROFILE_PATH = "profile/";
     private static final String POST_PATH = "post/";
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png");
     private final S3Repository s3Repository;
@@ -47,15 +46,22 @@ public class S3Service {
     }
 
     @Transactional
-    public ImageDto upload(MultipartFile file) {
+    public ImageDto uploadPostImage(MultipartFile file) {
+        URL responseUrl = uploadFileToS3(file, POST_PATH);
+        PostImage postImage = savePostImage(responseUrl);
+        return toImageDto(postImage);
+    }
+
+    @Transactional
+    public URL uploadProfileImage(MultipartFile file) {
+        return uploadFileToS3(file, PROFILE_PATH);
+    }
+
+    private URL uploadFileToS3(MultipartFile file, String path) {
         try (InputStream inputStream = file.getInputStream()) {
             String fileName = createFileName(file.getOriginalFilename());
             ObjectMetadata metadata = createObjectMetadata(file);
-
-            URL responseUrl = s3Repository.uploadFile(metadata, inputStream, POST_PATH + fileName);
-            PostImage postImage = savePostImage(responseUrl);
-
-            return toImageDto(postImage);
+            return s3Repository.uploadFile(metadata, inputStream, path + fileName);
         } catch (IOException e) {
             throw new CustomException(UNSUCCESSFUL_UPLOAD);
         }

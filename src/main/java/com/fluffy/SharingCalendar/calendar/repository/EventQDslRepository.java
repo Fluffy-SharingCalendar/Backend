@@ -1,13 +1,13 @@
 package com.fluffy.SharingCalendar.calendar.repository;
 
+import static com.fluffy.SharingCalendar.memory.domain.QPost.post;
+import static com.fluffy.SharingCalendar.memory.domain.QPostImage.postImage;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import java.net.URL;
 import java.util.List;
-
-import static com.fluffy.SharingCalendar.domain.QPost.post;
-import static com.fluffy.SharingCalendar.domain.QPostImage.postImage;
 
 @Repository
 public class EventQDslRepository {

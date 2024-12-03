@@ -1,5 +1,10 @@
 package com.fluffy.SharingCalendar.memory.repository;
 
+import static com.fluffy.SharingCalendar.memory.domain.QComment.comment;
+import static com.fluffy.SharingCalendar.memory.domain.QPost.post;
+import static com.fluffy.SharingCalendar.memory.domain.QPostImage.postImage;
+import static com.fluffy.SharingCalendar.user.domain.QUser.user;
+
 import com.fluffy.SharingCalendar.memory.domain.Post;
 import com.fluffy.SharingCalendar.image.ImageDto;
 import com.fluffy.SharingCalendar.memory.dto.PostDetail;
@@ -12,11 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import static com.fluffy.SharingCalendar.domain.QComment.comment;
-import static com.fluffy.SharingCalendar.domain.QPost.post;
-import static com.fluffy.SharingCalendar.domain.QPostImage.postImage;
-import static com.fluffy.SharingCalendar.domain.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
