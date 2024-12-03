@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.memory.service;
+package com.fluffy.SharingCalendar.image;
 
 import com.fluffy.SharingCalendar.memory.domain.PostImage;
 import com.fluffy.SharingCalendar.memory.repository.PostImageRepository;

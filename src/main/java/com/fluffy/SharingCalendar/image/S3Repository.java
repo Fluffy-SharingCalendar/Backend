@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.memory.repository;
+package com.fluffy.SharingCalendar.image;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;

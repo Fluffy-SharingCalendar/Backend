@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.memory.dto;
+package com.fluffy.SharingCalendar.image;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;

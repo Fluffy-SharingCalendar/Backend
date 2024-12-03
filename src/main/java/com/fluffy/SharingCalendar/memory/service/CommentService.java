@@ -29,7 +29,7 @@ public class CommentService {
     @Transactional
     public void register(int postId, CommentRequestDto request, String nickname) {
         Post post = postService.findByPostId(postId);
-        User user = userService.findByNickname(nickname);
+        User user = userService.findByLoginId(nickname);
 
         Comment comment = request.toEntity(post, user);
 
@@ -48,7 +48,7 @@ public class CommentService {
     @Transactional
     public void update(int commentId, String content, String nickname) {
         Comment comment = findCommentById(commentId);
-        User user = userService.findByNickname(nickname);
+        User user = userService.findByLoginId(nickname);
 
         validateAccess(comment.getAuthor().getId(), user.getId());
 
@@ -59,7 +59,7 @@ public class CommentService {
     @Transactional
     public void delete(int commentId, String nickname) {
         Comment comment = findCommentById(commentId);
-        User user = userService.findByNickname(nickname);
+        User user = userService.findByLoginId(nickname);
 
         validateAccess(comment.getAuthor().getId(), user.getId());
 

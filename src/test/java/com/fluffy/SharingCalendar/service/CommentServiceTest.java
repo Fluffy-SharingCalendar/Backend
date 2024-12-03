@@ -45,9 +45,7 @@ class CommentServiceTest {
     @BeforeEach
     void setup() {
         user = User.builder()
-                .nickname("yoojeongkwon")
-                .phoneNumber("010-1234-5678")
-                .profileImageIndex(1)
+                .loginId("yoojeongkwon")
                 .build();
 
         post = Post.builder()
@@ -104,9 +102,7 @@ class CommentServiceTest {
         commentRepository.save(comment);
 
         User anotherUser = User.builder()
-                .nickname("anotherUser")
-                .phoneNumber("010-5678-1234")
-                .profileImageIndex(2)
+                .loginId("anotherUser")
                 .build();
         userRepository.save(anotherUser);
 

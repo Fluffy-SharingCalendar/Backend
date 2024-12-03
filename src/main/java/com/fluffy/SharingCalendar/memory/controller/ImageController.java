@@ -1,7 +1,7 @@
 package com.fluffy.SharingCalendar.memory.controller;
 
-import com.fluffy.SharingCalendar.memory.dto.ImageDto;
-import com.fluffy.SharingCalendar.memory.service.S3Service;
+import com.fluffy.SharingCalendar.image.ImageDto;
+import com.fluffy.SharingCalendar.image.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class ImageController {
 
     @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ImageDto> uploadImage(@RequestPart(name = "file") MultipartFile file) {
-        return ResponseEntity.ok(s3Service.upload(file));
+        return ResponseEntity.ok(s3Service.uploadPostImage(file));
     }
 
     @DeleteMapping("/{imageId}")

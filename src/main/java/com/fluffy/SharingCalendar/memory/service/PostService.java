@@ -35,7 +35,7 @@ public class PostService {
     public long register(int eventId, RegisterPostRequestDto request, String nickname) {
         checkEventId(eventId);
 
-        User user = userService.findByNickname(nickname);
+        User user = userService.findByLoginId(nickname);
 
         Post post = request.toEntity(user, eventId);
 
@@ -55,7 +55,7 @@ public class PostService {
     @Transactional
     public void update(int postId, ModifyPostRequestDto request, String nickname) {
         Post post = findByPostId(postId);
-        User user = userService.findByNickname(nickname);
+        User user = userService.findByLoginId(nickname);
         validateAccess(post.getAuthor().getId(), user.getId());
 
         post.update(request.getContent());
@@ -69,7 +69,7 @@ public class PostService {
     @Transactional
     public void delete(int postId, String nickname) {
         Post post = findByPostId(postId);
-        User user = userService.findByNickname(nickname);
+        User user = userService.findByLoginId(nickname);
         validateAccess(post.getAuthor().getId(), user.getId());
 
         postImageRepository.updateAllByPostId(postId);

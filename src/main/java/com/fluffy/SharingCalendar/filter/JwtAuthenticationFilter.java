@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // JWT 토큰 검증
                 if (jwtUtil.isTokenValid(token)) {
                     String username = jwtUtil.getNickname(token);
-                    User user = userService.findByNickname(username); // 토큰에서 사용자 정보 추출 및 로드
+                    User user = userService.findByLoginId(username); // 토큰에서 사용자 정보 추출 및 로드
                     // SecurityContextHolder에 인증 정보 설정
                     SecurityContextHolder.getContext().setAuthentication(
                             new UsernamePasswordAuthenticationToken(
