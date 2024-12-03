@@ -14,7 +14,6 @@ public class CommentResponseDto {
     private final int commentId;
     private final long authorId;
     private final String authorNickname;
-    private final int authorProfileNo;
     private final String content;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
@@ -24,8 +23,7 @@ public class CommentResponseDto {
         User author = comment.getAuthor();
         this.commentId = comment.getCommentId();
         this.authorId = author.getId();
-        this.authorNickname = author.getNickname();
-        this.authorProfileNo = author.getProfileImageIndex();
+        this.authorNickname = author.getLoginId();
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
     }

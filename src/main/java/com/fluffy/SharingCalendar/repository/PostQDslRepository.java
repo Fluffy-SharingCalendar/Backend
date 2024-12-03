@@ -30,8 +30,7 @@ public class PostQDslRepository {
                         PostDetail.class,
                         post.id,
                         post.author.id,
-                        post.author.nickname.as("authorNickname"),
-                        post.author.profileImageIndex.as("authorProfileImageNo"),
+                        post.author.loginId,
                         post.content,
                         post.eventDate,
                         comment.count().intValue().as("commentCnt")

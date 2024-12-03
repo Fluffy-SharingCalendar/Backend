@@ -21,7 +21,7 @@ public class JwtUtil {
 
     public String generateToken(User user) {
         String token = Jwts.builder()
-                .setSubject(user.getNickname())
+                .setSubject(user.getLoginId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY_SECONDS * 1000))
                 .signWith(SignatureAlgorithm.HS256, secret)

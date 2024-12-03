@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             User user = new ObjectMapper().readValue(body, User.class);
 
             // 닉네임 길이 유효성 검사
-            userService.validateNickname(user.getNickname());
+            userService.validateNickname(user.getLoginId());
 
             // 사용자 저장 및 토큰 생성
             userService.save(user);
