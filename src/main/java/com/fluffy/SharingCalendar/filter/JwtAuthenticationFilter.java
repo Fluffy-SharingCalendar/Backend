@@ -1,9 +1,8 @@
 package com.fluffy.SharingCalendar.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluffy.SharingCalendar.domain.User;
-import com.fluffy.SharingCalendar.exception.CustomException;
-import com.fluffy.SharingCalendar.service.UserService;
+import com.fluffy.SharingCalendar.user.domain.User;
+import com.fluffy.SharingCalendar.user.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,8 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-
-import static com.fluffy.SharingCalendar.exception.ErrorCode.INVALID_NICKNAME;
 
 @RequiredArgsConstructor
 @Log4j2

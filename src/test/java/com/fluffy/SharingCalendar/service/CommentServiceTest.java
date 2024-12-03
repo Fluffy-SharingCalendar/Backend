@@ -1,14 +1,15 @@
 package com.fluffy.SharingCalendar.service;
 
-import com.fluffy.SharingCalendar.domain.Comment;
-import com.fluffy.SharingCalendar.domain.Post;
-import com.fluffy.SharingCalendar.domain.User;
-import com.fluffy.SharingCalendar.dto.request.CommentRequestDto;
-import com.fluffy.SharingCalendar.dto.response.CommentResponseDto;
+import com.fluffy.SharingCalendar.memory.domain.Comment;
+import com.fluffy.SharingCalendar.memory.domain.Post;
+import com.fluffy.SharingCalendar.memory.service.CommentService;
+import com.fluffy.SharingCalendar.user.domain.User;
+import com.fluffy.SharingCalendar.memory.dto.request.CommentRequestDto;
+import com.fluffy.SharingCalendar.memory.dto.response.CommentResponseDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
-import com.fluffy.SharingCalendar.repository.CommentRepository;
-import com.fluffy.SharingCalendar.repository.PostRepository;
-import com.fluffy.SharingCalendar.repository.UserRepository;
+import com.fluffy.SharingCalendar.memory.repository.CommentRepository;
+import com.fluffy.SharingCalendar.memory.repository.PostRepository;
+import com.fluffy.SharingCalendar.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

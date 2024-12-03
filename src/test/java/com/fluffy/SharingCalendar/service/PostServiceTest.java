@@ -1,13 +1,13 @@
 //package com.fluffy.SharingCalendar.service;
 //
 //import com.fluffy.SharingCalendar.domain.Post;
-//import com.fluffy.SharingCalendar.domain.User;
+//import com.fluffy.SharingCalendar.user.domain.User;
 //import com.fluffy.SharingCalendar.dto.request.ModifyPostRequestDto;
 //import com.fluffy.SharingCalendar.dto.request.RegisterPostRequestDto;
 //import com.fluffy.SharingCalendar.dto.response.PagedPostResponse;
 //import com.fluffy.SharingCalendar.repository.PostImageRepository;
 //import com.fluffy.SharingCalendar.repository.PostRepository;
-//import com.fluffy.SharingCalendar.repository.UserRepository;
+//import com.fluffy.SharingCalendar.user.repository.UserRepository;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
