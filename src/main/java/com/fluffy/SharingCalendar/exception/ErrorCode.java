@@ -12,6 +12,7 @@ public enum ErrorCode {
     /* 400 BAD_REQUEST 잘못된 요청 */
     INVALID_PARAMETER(BAD_REQUEST, "파라미터 값을 확인해주세요."),
     INVALID_NICKNAME(BAD_REQUEST, "닉네임은 1자에서 25자 사이여야 합니다."),
+    INVALID_CALENDAR_NAME(BAD_REQUEST, "캘린더 이름은 1~25자 사이여야 합니다."),
     INVALID_EXTENSION(BAD_REQUEST, "파일 확장자는 jpg, jpeg, png만 가능합니다."),
 
 
@@ -30,7 +31,7 @@ public enum ErrorCode {
     ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 닉네임입니다."),
 
     /* 413 Request Entity Too Large */
-    MAX_FILE_SIZE_EXCEEDED(PAYLOAD_TOO_LARGE, "이미지 파일은 10MB이하여야합니다."),
+    MAX_FILE_SIZE_EXCEEDED(PAYLOAD_TOO_LARGE, "이미지 파일은 30MB이하여야합니다."),
 
     /* 500 INTERNAL SERVER ERROR */
     UNSUCCESSFUL_UPLOAD(INTERNAL_SERVER_ERROR, "이미지 파일 업로드에 실패했습니다."),

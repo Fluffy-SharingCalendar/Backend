@@ -1,7 +1,6 @@
 package com.fluffy.SharingCalendar.memory.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fluffy.SharingCalendar.image.ImageDto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 

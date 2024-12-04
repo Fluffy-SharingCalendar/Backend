@@ -9,8 +9,8 @@ import com.fluffy.SharingCalendar.calendar.dto.response.CalendarResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.RegisterCalendarResponseDto;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarMemberRepository;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
+import com.fluffy.SharingCalendar.common.image.S3Service;
 import com.fluffy.SharingCalendar.exception.CustomException;
-import com.fluffy.SharingCalendar.image.S3Service;
 import com.fluffy.SharingCalendar.user.domain.User;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import java.net.URL;
@@ -34,7 +34,7 @@ public class CalendarService {
 
         User user = userService.findByLoginId(userId);
         URL profileImageUrl =
-                profileImage != null ? s3Service.uploadProfileImage(profileImage) : DEFAULT_PROFILE_IMAGE_URL;
+                isImage(profileImage) ? s3Service.uploadProfileImage(profileImage) : DEFAULT_PROFILE_IMAGE_URL;
 
         Calendar calendar = saveCalendar(name, profileImageUrl);
         saveCalendarMember(calendar, user.getId());
@@ -49,16 +49,50 @@ public class CalendarService {
                 .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
     }
 
+    @Transactional
+    public RegisterCalendarResponseDto updateCalendar(Integer calendarId, String newName,
+            MultipartFile newProfileImage) {
+        Calendar calendar = calendarRepository.findById(calendarId)
+                .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
+
+        calendar.changeName(newName);
+        changeProfileImage(newProfileImage, calendar);
+        calendarRepository.save(calendar);
+
+        return new RegisterCalendarResponseDto(calendarId);
+    }
+
+    private boolean isImage(MultipartFile file) {
+        return file != null && !file.isEmpty();
+    }
+
     private Calendar saveCalendar(String name, URL profileImageUrl) {
-        Calendar calendar = Calendar.builder().name(name).profileImageUrl(profileImageUrl).build();
+        Calendar calendar = Calendar.builder()
+                .name(name)
+                .profileImageUrl(profileImageUrl)
+                .build();
 
         return calendarRepository.save(calendar);
     }
 
     private void saveCalendarMember(Calendar calendar, Integer userId) {
-        CalendarMember calendarMember = CalendarMember.builder().calendar(calendar).userId(userId).status("accepted")
-                .invitedAt(LocalDateTime.now()).build();
+        CalendarMember calendarMember = CalendarMember.builder()
+                .calendar(calendar)
+                .userId(userId)
+                .status("accepted")
+                .invitedAt(LocalDateTime.now())
+                .build();
 
         calendarMemberRepository.save(calendarMember);
+    }
+
+    private void changeProfileImage(MultipartFile newProfileImage, Calendar calendar) {
+        if (isImage(newProfileImage)) {
+            s3Service.deleteImage(calendar.getProfileImageUrl());
+            URL profileImageUrl = s3Service.uploadProfileImage(newProfileImage);
+            calendar.changeProfileImage(profileImageUrl);
+
+            calendarRepository.save(calendar);
+        }
     }
 }

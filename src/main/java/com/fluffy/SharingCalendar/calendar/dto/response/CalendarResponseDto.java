@@ -4,15 +4,13 @@ import static com.fluffy.SharingCalendar.common.Constant.DEFAULT_PROFILE_IMAGE_U
 
 import com.fluffy.SharingCalendar.calendar.domain.Calendar;
 import java.net.URL;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class CalendarResponseDto {
     private String name;
     private URL profileImageUrl;
-    private String backgroundImage;
+    private URL backgroundImage;
 
     public CalendarResponseDto(Calendar calendar) {
         this.name = calendar.getName();

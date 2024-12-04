@@ -1,8 +1,9 @@
-package com.fluffy.SharingCalendar.image;
+package com.fluffy.SharingCalendar.common.image;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fluffy.SharingCalendar.memory.domain.PostImage;
 import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.memory.dto.ImageDto;
 import com.fluffy.SharingCalendar.memory.repository.PostImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,10 +34,16 @@ public class S3Service {
     private final PostImageRepository postImageRepository;
 
     @Transactional
-    public void delete(int imageId) {
-        PostImage postImage = postImageRepository.findById(imageId).orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
-        s3Repository.deleteFile(postImage.getImageUrl().getPath().substring(1));
+    public void deletePostImage(int imageId) {
+        PostImage postImage = postImageRepository.findById(imageId)
+                .orElseThrow(() -> new CustomException(IMAGE_NOT_FOUND));
+        deleteImage(postImage.getImageUrl());
         postImageRepository.delete(postImage);
+    }
+
+    @Transactional
+    public void deleteImage(URL imageUrl) {
+        s3Repository.deleteFile(imageUrl.getPath().substring(1));
     }
 
     @Transactional
@@ -101,6 +108,5 @@ public class S3Service {
     private ImageDto toImageDto(PostImage postImage) {
         return ImageDto.builder().imageId(postImage.getId()).url(postImage.getImageUrl()).build();
     }
-
 }
 

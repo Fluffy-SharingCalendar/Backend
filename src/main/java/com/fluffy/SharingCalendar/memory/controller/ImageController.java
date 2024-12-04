@@ -1,7 +1,7 @@
 package com.fluffy.SharingCalendar.memory.controller;
 
-import com.fluffy.SharingCalendar.image.ImageDto;
-import com.fluffy.SharingCalendar.image.S3Service;
+import com.fluffy.SharingCalendar.memory.dto.ImageDto;
+import com.fluffy.SharingCalendar.common.image.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class ImageController {
 
     @DeleteMapping("/{imageId}")
     public ResponseEntity<Void> deleteImage(@PathVariable(name = "imageId") int imageId) {
-        s3Service.delete(imageId);
+        s3Service.deletePostImage(imageId);
         return ResponseEntity.ok().build();
     }
 }

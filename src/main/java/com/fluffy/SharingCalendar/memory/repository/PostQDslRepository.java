@@ -6,7 +6,7 @@ import static com.fluffy.SharingCalendar.memory.domain.QPostImage.postImage;
 import static com.fluffy.SharingCalendar.user.domain.QUser.user;
 
 import com.fluffy.SharingCalendar.memory.domain.Post;
-import com.fluffy.SharingCalendar.image.ImageDto;
+import com.fluffy.SharingCalendar.memory.dto.ImageDto;
 import com.fluffy.SharingCalendar.memory.dto.PostDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
