@@ -1,16 +1,16 @@
 package com.fluffy.SharingCalendar.calendar.service;
 
+import static com.fluffy.SharingCalendar.common.Constant.DEFAULT_PROFILE_IMAGE_URL;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.EVENT_NOT_FOUND;
 
-import com.fluffy.SharingCalendar.config.S3Config;
 import com.fluffy.SharingCalendar.calendar.domain.Event;
 import com.fluffy.SharingCalendar.calendar.dto.EventDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.EventDetailResponseDto;
-import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.calendar.repository.EventQDslRepository;
 import com.fluffy.SharingCalendar.calendar.repository.EventRepository;
+import com.fluffy.SharingCalendar.exception.CustomException;
 import java.net.URL;
 import java.util.List;
 import java.util.Random;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class EventService {
 
-    public static final URL DEFAULT_PROFILE_IMAGE_URL = S3Config.getDefaultImage();
     private final EventRepository eventRepository;
     private final EventQDslRepository eventQDslRepository;
     private final CalendarRepository calendarRepository;
