@@ -15,6 +15,7 @@ import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.common.image.S3Service;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.user.domain.User;
+import com.fluffy.SharingCalendar.user.repository.UserRepository;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class CalendarService {
 
     private final CalendarRepository calendarRepository;
     private final CalendarMemberRepository calendarMemberRepository;
+    private final UserRepository userRepository;
     private final S3Service s3Service;
     private final UserService userService;
 
@@ -76,11 +78,12 @@ public class CalendarService {
     }
 
     @Transactional
-    public void inviteUserToCalendar(int calendarId, int userId) {
+    public void inviteUserToCalendar(int calendarId, int invitedUserId, String loginId) {
         Calendar calendar = findByCalendarId(calendarId);
-        User user = userService.findByUserId(userId);
+        User loginUser = userService.findByLoginId(loginId);
+        User user = userService.findByUserId(invitedUserId);
 
-        checkInvitation(calendarId, userId);
+        checkInvitation(calendarId, invitedUserId, loginUser.getId());
 
         CalendarMember member = CalendarMember.builder()
                 .calendar(calendar)
@@ -98,6 +101,14 @@ public class CalendarService {
         Calendar calendar = findByCalendarId(calendarId);
         return calendarMemberRepository.findByCalendarId(calendar.getId())
                 .stream().map(CalendarMemberResponseDto::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CalendarMemberResponseDto> searchUsersByName(int calendarId, String keyword) {
+        return userRepository.findByNameContaining(keyword)
+                .stream()
+                .map(user -> new CalendarMemberResponseDto(user, isCalendarMember(calendarId, user.getId())))
                 .toList();
     }
 
@@ -142,8 +153,8 @@ public class CalendarService {
         }
     }
 
-    private void checkInvitation(int calendarId, int userId) {
-        checkUserIncluded(calendarId, userId);
+    private void checkInvitation(int calendarId, int userId, int loginUserId) {
+        checkUserIncluded(calendarId, loginUserId);
         checkDuplicateInvitation(calendarId, userId);
     }
 
@@ -156,5 +167,13 @@ public class CalendarService {
         calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId).ifPresent(member -> {
             throw new CustomException(ALREADY_INVITED_USER);
         });
+    }
+
+    private String isCalendarMember(Integer calendarId, Integer userId) {
+        if(calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId).isPresent()) {
+            return "true";
+        }
+
+        return "false";
     }
 }
