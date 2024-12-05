@@ -7,6 +7,7 @@ import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
 
 import com.fluffy.SharingCalendar.calendar.domain.Calendar;
 import com.fluffy.SharingCalendar.calendar.domain.CalendarMember;
+import com.fluffy.SharingCalendar.calendar.dto.response.CalendarMemberResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.CalendarResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.RegisterCalendarResponseDto;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarMemberRepository;
@@ -17,6 +18,7 @@ import com.fluffy.SharingCalendar.user.domain.User;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +53,7 @@ public class CalendarService {
     @Transactional
     public RegisterCalendarResponseDto updateCalendar(Integer calendarId, String newName,
             MultipartFile newProfileImage) {
-        Calendar calendar = calendarRepository.findById(calendarId)
-                .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
+        Calendar calendar = findByCalendarId(calendarId);
 
         calendar.changeName(newName);
         changeProfileImage(newProfileImage, calendar);
@@ -65,8 +66,7 @@ public class CalendarService {
     public void leaveCalendar(Integer calendarId, String loginId) {
         User user = userService.findByLoginId(loginId);
 
-        CalendarMember member = calendarMemberRepository.findByCalendarIdAndUserId(calendarId, user.getId())
-                .orElseThrow(() -> new CustomException(CALENDAR_MEMBER_NOT_FOUND));
+        CalendarMember member = checkUserIncluded(calendarId, user.getId());
         Calendar calendar = member.getCalendar();
         calendarMemberRepository.delete(member);
 
@@ -91,6 +91,14 @@ public class CalendarService {
                 .build();
 
         calendarMemberRepository.save(member);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CalendarMemberResponseDto> getCalendarMembers(int calendarId) {
+        Calendar calendar = findByCalendarId(calendarId);
+        return calendarMemberRepository.findByCalendarId(calendar.getId())
+                .stream().map(CalendarMemberResponseDto::new)
+                .toList();
     }
 
     private Calendar findByCalendarId(int calendarId) {
@@ -139,8 +147,8 @@ public class CalendarService {
         checkDuplicateInvitation(calendarId, userId);
     }
 
-    private void checkUserIncluded(Integer calendarId, Integer userId) {
-        calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId)
+    private CalendarMember checkUserIncluded(Integer calendarId, Integer userId) {
+        return calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId)
                 .orElseThrow(() -> new CustomException(CALENDAR_MEMBER_NOT_FOUND));
     }
 
