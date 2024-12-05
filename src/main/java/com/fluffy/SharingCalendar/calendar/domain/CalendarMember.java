@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.net.URL;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,12 @@ public class CalendarMember {
 
     @Column(name = "user_id", nullable = false)
     private Integer userId;
+
+    @Column(name = "profile_name", nullable = false, length = 20)
+    private String profileName;
+
+    @Column(name = "profile_image_url")
+    private URL profileImageUrl;
 
     @Column(nullable = false, length = 50)
     private String status = "invited"; //invited, accepted

@@ -75,13 +75,7 @@ public class Calendar {
         }
     }
 
-    public void addMember(CalendarMember member) {
-        members.add(member);
-        member.setCalendar(this);
-    }
-
-    public void removeMember(CalendarMember member) {
-        members.remove(member);
-        member.setCalendar(null);
+    public boolean isEmpty() {
+        return members.isEmpty();
     }
 }

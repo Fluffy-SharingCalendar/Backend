@@ -22,6 +22,7 @@ public enum ErrorCode {
     /* 404 NOT_FOUND 잘못된 리소스 접근 */
     CALENDAR_NOT_FOUND(NOT_FOUND, "해당 캘린더를 찾을 수 없습니다."),
     USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),
+    CALENDAR_MEMBER_NOT_FOUND(NOT_FOUND, "사용자가 캘린더 멤버가 아니거나 캘린더를 찾을 수 없습니다."),
     EVENT_NOT_FOUND(NOT_FOUND, "해당 일정을 찾을 수 없습니다."),
     POST_NOT_FOUND(NOT_FOUND, "해당 게시글을 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(NOT_FOUND, "해당 댓글을 찾을 수 없습니다."),

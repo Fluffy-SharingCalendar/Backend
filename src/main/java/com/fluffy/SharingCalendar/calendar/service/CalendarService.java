@@ -1,6 +1,7 @@
 package com.fluffy.SharingCalendar.calendar.service;
 
 import static com.fluffy.SharingCalendar.common.Constant.DEFAULT_PROFILE_IMAGE_URL;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_MEMBER_NOT_FOUND;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
 
 import com.fluffy.SharingCalendar.calendar.domain.Calendar;
@@ -30,14 +31,14 @@ public class CalendarService {
     private final UserService userService;
 
     @Transactional
-    public RegisterCalendarResponseDto createCalendar(String name, MultipartFile profileImage, String userId) {
+    public RegisterCalendarResponseDto createCalendar(String name, MultipartFile profileImage, String loginId) {
 
-        User user = userService.findByLoginId(userId);
+        User user = userService.findByLoginId(loginId);
         URL profileImageUrl =
                 isImage(profileImage) ? s3Service.uploadProfileImage(profileImage) : DEFAULT_PROFILE_IMAGE_URL;
 
         Calendar calendar = saveCalendar(name, profileImageUrl);
-        saveCalendarMember(calendar, user.getId());
+        saveCalendarMember(calendar, user);
 
         return new RegisterCalendarResponseDto(calendar.getId());
     }
@@ -62,6 +63,20 @@ public class CalendarService {
         return new RegisterCalendarResponseDto(calendarId);
     }
 
+    @Transactional
+    public void leaveCalendar(Integer calendarId, String loginId) {
+        User user = userService.findByLoginId(loginId);
+
+        CalendarMember member = calendarMemberRepository.findByCalendarIdAndUserId(calendarId, user.getId())
+                .orElseThrow(() -> new CustomException(CALENDAR_MEMBER_NOT_FOUND));
+        Calendar calendar = member.getCalendar();
+        calendarMemberRepository.delete(member);
+
+        if (calendar.isEmpty()) {
+            calendarRepository.delete(calendar);
+        }
+    }
+
     private boolean isImage(MultipartFile file) {
         return file != null && !file.isEmpty();
     }
@@ -75,10 +90,12 @@ public class CalendarService {
         return calendarRepository.save(calendar);
     }
 
-    private void saveCalendarMember(Calendar calendar, Integer userId) {
+    private void saveCalendarMember(Calendar calendar, User user) {
         CalendarMember calendarMember = CalendarMember.builder()
                 .calendar(calendar)
-                .userId(userId)
+                .userId(user.getId())
+                .profileName(user.getName())
+                .profileImageUrl(DEFAULT_PROFILE_IMAGE_URL)
                 .status("accepted")
                 .invitedAt(LocalDateTime.now())
                 .build();
