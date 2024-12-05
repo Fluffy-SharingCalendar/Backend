@@ -5,14 +5,14 @@ import lombok.Builder;
 
 @Builder
 public class UserInfoDto {
-    private String nickname;
-    private String phoneNumber;
-    private int profileImageIndex;
+    private String name;
+    private String loginId;
+    private boolean notificationStatus;
 
-    public UserInfoDto(String nickname, String phoneNumber, int profileImageIndex) {
-        this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
-        this.profileImageIndex = profileImageIndex;
+    public UserInfoDto(String name, String loginId, boolean notificationStatus) {
+        this.name = name;
+        this.loginId = loginId;
+        this.notificationStatus = notificationStatus;
     }
 
 }

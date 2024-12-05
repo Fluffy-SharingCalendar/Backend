@@ -11,8 +11,9 @@ import static org.springframework.http.HttpStatus.*;
 public enum ErrorCode {
     /* 400 BAD_REQUEST 잘못된 요청 */
     INVALID_PARAMETER(BAD_REQUEST, "파라미터 값을 확인해주세요."),
-    INVALID_NICKNAME(BAD_REQUEST, "닉네임은 1자에서 25자 사이여야 합니다."),
+    INVALID_NAME(BAD_REQUEST, "이름은 1자에서 25자 사이여야 합니다."),
     INVALID_EXTENSION(BAD_REQUEST, "파일 확장자는 jpg, jpeg, png만 가능합니다."),
+    INVALID_LOGIN_ID(BAD_REQUEST, "아이디는 1자에서 25자 사이여야 합니다."),
 
 
     /* 403 FORBIDDEN 권한 없음 */

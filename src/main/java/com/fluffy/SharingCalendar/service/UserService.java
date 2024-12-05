@@ -18,16 +18,23 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public boolean checkNickname(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
+    public boolean checkLoginIdDuplicate(String loginId) {
+        if (userRepository.existsByLoginId(loginId)) {
             throw new CustomException(ALREADY_SAVED_DISPLAY);
         }
         return true;
     }
 
-    public boolean validateNickname(String nickname) {
-        if (nickname.length() < 1 || nickname.length() > 25) {
-            throw new CustomException(INVALID_NICKNAME);
+    public boolean validateLoginId(String loginId) {
+        if (loginId.length() < 1 || loginId.length() > 25) {
+            throw new CustomException(INVALID_LOGIN_ID);
+        }
+        return true;
+    }
+
+    public boolean validateName(String name) {
+        if (name.length() < 1 || name.length() > 25) {
+            throw new CustomException(INVALID_NAME);
         }
         return true;
     }
@@ -37,21 +44,21 @@ public class UserService {
     }
 
     @Transactional
-    public User findByNickname(String nickname) {
-        return userRepository.findByNickname(nickname)
+    public User findByLoginId(String nickname) {
+        return userRepository.findByLoginId(nickname)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
     // 토큰으로 사용자 정보 얻어오기
     public UserInfoDto getUserInfo(String token) {
-        String nickname = jwtUtil.getNickname(token);
-        User user = userRepository.findByNickname(nickname)
+        String loginId = jwtUtil.getLoginId(token);
+        User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         return UserInfoDto.builder()
-                .nickname(user.getNickname())
-                .phoneNumber(user.getPhoneNumber())
-                .profileImageIndex(user.getProfileImageIndex())
+                .name(user.getName())
+                .loginId(user.getLoginId())
+                .notificationStatus(user.isNotificationStatus())
                 .build();
     }
 
