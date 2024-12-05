@@ -1,6 +1,7 @@
 package com.fluffy.SharingCalendar.calendar.service;
 
 import static com.fluffy.SharingCalendar.common.Constant.DEFAULT_PROFILE_IMAGE_URL;
+import static com.fluffy.SharingCalendar.exception.ErrorCode.ALREADY_INVITED_USER;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_MEMBER_NOT_FOUND;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
 
@@ -32,7 +33,6 @@ public class CalendarService {
 
     @Transactional
     public RegisterCalendarResponseDto createCalendar(String name, MultipartFile profileImage, String loginId) {
-
         User user = userService.findByLoginId(loginId);
         URL profileImageUrl =
                 isImage(profileImage) ? s3Service.uploadProfileImage(profileImage) : DEFAULT_PROFILE_IMAGE_URL;
@@ -45,9 +45,7 @@ public class CalendarService {
 
     @Transactional(readOnly = true)
     public CalendarResponseDto findCalendarById(int calendarId) {
-        return calendarRepository.findById(calendarId)
-                .map(CalendarResponseDto::new)
-                .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
+        return new CalendarResponseDto(findByCalendarId(calendarId));
     }
 
     @Transactional
@@ -75,6 +73,29 @@ public class CalendarService {
         if (calendar.isEmpty()) {
             calendarRepository.delete(calendar);
         }
+    }
+
+    @Transactional
+    public void inviteUserToCalendar(int calendarId, int userId) {
+        Calendar calendar = findByCalendarId(calendarId);
+        User user = userService.findByUserId(userId);
+
+        checkInvitation(calendarId, userId);
+
+        CalendarMember member = CalendarMember.builder()
+                .calendar(calendar)
+                .userId(user.getId())
+                .profileName(user.getName())
+                .profileImageUrl(DEFAULT_PROFILE_IMAGE_URL)
+                .status("invited")
+                .build();
+
+        calendarMemberRepository.save(member);
+    }
+
+    private Calendar findByCalendarId(int calendarId) {
+        return calendarRepository.findById(calendarId)
+                .orElseThrow(() -> new CustomException(CALENDAR_NOT_FOUND));
     }
 
     private boolean isImage(MultipartFile file) {
@@ -111,5 +132,21 @@ public class CalendarService {
 
             calendarRepository.save(calendar);
         }
+    }
+
+    private void checkInvitation(int calendarId, int userId) {
+        checkUserIncluded(calendarId, userId);
+        checkDuplicateInvitation(calendarId, userId);
+    }
+
+    private void checkUserIncluded(Integer calendarId, Integer userId) {
+        calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId)
+                .orElseThrow(() -> new CustomException(CALENDAR_MEMBER_NOT_FOUND));
+    }
+
+    private void checkDuplicateInvitation(Integer calendarId, Integer userId) {
+        calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId).ifPresent(member -> {
+            throw new CustomException(ALREADY_INVITED_USER);
+        });
     }
 }

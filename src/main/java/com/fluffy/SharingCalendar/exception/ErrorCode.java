@@ -30,6 +30,7 @@ public enum ErrorCode {
 
     /* 409 CONFLICT 중복된 리소스 */
     ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 닉네임입니다."),
+    ALREADY_INVITED_USER(CONFLICT,"이미 초대된 사용자입니다."),
 
     /* 413 Request Entity Too Large */
     MAX_FILE_SIZE_EXCEEDED(PAYLOAD_TOO_LARGE, "이미지 파일은 30MB이하여야합니다."),

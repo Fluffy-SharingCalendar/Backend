@@ -41,6 +41,12 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
+    @Transactional
+    public User findByUserId(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
 //    // 토큰으로 사용자 정보 얻어오기
 //    public UserInfoDto getUserInfo(String token) {
 //        String nickname = jwtUtil.getNickname(token);
