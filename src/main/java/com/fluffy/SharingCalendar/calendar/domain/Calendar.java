@@ -69,13 +69,13 @@ public class Calendar {
     }
 
     public void changeName(String newName) {
-        if (newName != null && !newName.isBlank()) {
+        if (newName != null && !newName.isBlank() && !newName.equals(this.name)) {
             this.name = newName;
         }
     }
 
     public void changeProfileImage(URL newProfileImageUrl) {
-        if (newProfileImageUrl != null) {
+        if (newProfileImageUrl != null && !newProfileImageUrl.equals(this.profileImageUrl)) {
             this.profileImageUrl = newProfileImageUrl;
         }
     }

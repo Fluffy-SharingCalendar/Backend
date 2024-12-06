@@ -52,8 +52,9 @@ public class CalendarService {
 
     @Transactional(readOnly = true)
     public CalendarResponseDto findCalendarById(int calendarId, String loginId) {
+        Calendar calendar = findByCalendarId(calendarId);
         checkUserIncluded(calendarId, loginId);
-        return new CalendarResponseDto(findByCalendarId(calendarId));
+        return new CalendarResponseDto(calendar);
     }
 
     @Transactional
@@ -101,9 +102,9 @@ public class CalendarService {
 
     @Transactional(readOnly = true)
     public List<CalendarMemberResponseDto> getCalendarMembers(int calendarId, String loginId) {
+        Calendar calendar = findByCalendarId(calendarId);
         checkUserIncluded(calendarId, loginId);
 
-        Calendar calendar = findByCalendarId(calendarId);
         return calendar.getMembers().stream()
                 .map(CalendarMemberResponseDto::new)
                 .toList();

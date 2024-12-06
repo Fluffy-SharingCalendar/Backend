@@ -22,6 +22,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Integer id;
 
     @Column(name = "login_id", nullable = false, length = 20, unique = true)
@@ -40,6 +41,6 @@ public class User {
     private Boolean notificationStatus = true;
 
     @Column(nullable = false, length = 1)
-    private String isDeleted = "N";
+    private char isDeleted = 'N';
 
 }
