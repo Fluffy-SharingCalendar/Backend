@@ -1,7 +1,7 @@
 package com.fluffy.SharingCalendar.config;
 
 import com.fluffy.SharingCalendar.filter.JwtAuthenticationFilter;
-import com.fluffy.SharingCalendar.service.UserService;
+import com.fluffy.SharingCalendar.user.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/login").permitAll()     // 로그인은 허용
                         .requestMatchers(HttpMethod.POST, "/api/users/validation").permitAll() // 닉네임 중복 검사 허용
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // 회원가입 허용
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가

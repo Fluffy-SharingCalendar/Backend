@@ -1,19 +1,23 @@
-package com.fluffy.SharingCalendar.service;
+package com.fluffy.SharingCalendar.user.service;
 
 import com.fluffy.SharingCalendar.domain.SecurityAnswer;
 import com.fluffy.SharingCalendar.domain.SecurityQuestion;
-import com.fluffy.SharingCalendar.domain.User;
-import com.fluffy.SharingCalendar.dto.SecurityAnswerDto;
-import com.fluffy.SharingCalendar.dto.UserInfoDto;
-import com.fluffy.SharingCalendar.dto.request.RegisterUserRequestDto;
+import com.fluffy.SharingCalendar.user.domain.User;
+import com.fluffy.SharingCalendar.user.dto.SecurityAnswerDto;
+import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
+import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
-import com.fluffy.SharingCalendar.repository.SecurityAnswerRepository;
-import com.fluffy.SharingCalendar.repository.SecurityQuestionRepository;
-import com.fluffy.SharingCalendar.repository.UserRepository;
+import com.fluffy.SharingCalendar.user.repository.SecurityAnswerRepository;
+import com.fluffy.SharingCalendar.user.repository.SecurityQuestionRepository;
+import com.fluffy.SharingCalendar.user.repository.UserRepository;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,7 @@ import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
 @Service
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final SecurityQuestionRepository securityQuestionRepository;
     private final SecurityAnswerRepository securityAnswerRepository;
@@ -50,11 +55,15 @@ public class UserService {
     }
 
     public boolean validatePassword(String password) {
-        // 비밀번호 유효성 검사: 8자 이상, 영문, 숫자, 특수기호 포함
-        String passwordPattern = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?])(?=.{8,})";
-        if (!password.matches(passwordPattern)) {
+        // 비밀번호 유효성 검사: 8자 이상, 영문(대문자/소문자), 숫자, 특수기호 포함
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,20}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(password);
+
+        if (!matcher.matches()) {
             throw new CustomException(INVALID_PASSWORD);
         }
+
         return true;
     }
 
@@ -119,6 +128,4 @@ public class UserService {
                 .question(securityQuestion)
                 .build();
     }
-
-
 }

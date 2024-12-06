@@ -1,6 +1,6 @@
 package com.fluffy.SharingCalendar.util;
 
-import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.user.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

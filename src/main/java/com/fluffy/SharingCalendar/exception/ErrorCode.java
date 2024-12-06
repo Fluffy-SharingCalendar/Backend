@@ -14,8 +14,7 @@ public enum ErrorCode {
     INVALID_NAME(BAD_REQUEST, "이름은 1자에서 25자 사이여야 합니다."),
     INVALID_EXTENSION(BAD_REQUEST, "파일 확장자는 jpg, jpeg, png만 가능합니다."),
     INVALID_LOGIN_ID(BAD_REQUEST, "아이디는 1자에서 25자 사이여야 합니다."),
-    INVALID_PASSWORD(BAD_REQUEST, "비밀번호는 8자 이상의 영문, 숫자, 특수기호를 포함해야합니다."),
-
+    INVALID_PASSWORD(BAD_REQUEST, "비밀번호는 대문자, 소문자, 숫자, 특수문자가 포함된 8~20자의 비밀번호여야 합니다."),
 
     /* 403 FORBIDDEN 권한 없음 */
     NO_PERMISSION_FOR_MODIFICATION(FORBIDDEN, "해당 작업의 수정/삭제 권한이 없습니다."),

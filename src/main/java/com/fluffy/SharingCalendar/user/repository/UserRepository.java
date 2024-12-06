@@ -1,6 +1,6 @@
-package com.fluffy.SharingCalendar.repository;
+package com.fluffy.SharingCalendar.user.repository;
 
-import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

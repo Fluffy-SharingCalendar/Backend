@@ -1,6 +1,6 @@
-package com.fluffy.SharingCalendar.dto.request;
+package com.fluffy.SharingCalendar.user.dto.request;
 
-import com.fluffy.SharingCalendar.dto.SecurityAnswerDto;
+import com.fluffy.SharingCalendar.user.dto.SecurityAnswerDto;
 import java.util.List;
 import lombok.Getter;
 

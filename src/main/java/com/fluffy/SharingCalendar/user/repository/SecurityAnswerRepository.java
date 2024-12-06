@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.repository;
+package com.fluffy.SharingCalendar.user.repository;
 
 import com.fluffy.SharingCalendar.domain.SecurityAnswer;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package com.fluffy.SharingCalendar.domain;
+package com.fluffy.SharingCalendar.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -40,7 +40,7 @@ public class User {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDateTime createdAt;
 
-    @Column(name = "isDeleted")
+    @Column(name = "is_deleted")
     private char isDeleted;
 
 

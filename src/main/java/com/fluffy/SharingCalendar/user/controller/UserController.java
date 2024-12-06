@@ -1,8 +1,8 @@
-package com.fluffy.SharingCalendar.controller;
+package com.fluffy.SharingCalendar.user.controller;
 
-import com.fluffy.SharingCalendar.dto.request.CheckLoginIdRequestDto;
-import com.fluffy.SharingCalendar.dto.request.RegisterUserRequestDto;
-import com.fluffy.SharingCalendar.service.UserService;
+import com.fluffy.SharingCalendar.user.dto.request.CheckLoginIdRequestDto;
+import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
+import com.fluffy.SharingCalendar.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
