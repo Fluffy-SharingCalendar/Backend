@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
 @Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor
@@ -40,4 +42,6 @@ public class User {
 
     @Column(name = "isDeleted")
     private char isDeleted;
+
+
 }

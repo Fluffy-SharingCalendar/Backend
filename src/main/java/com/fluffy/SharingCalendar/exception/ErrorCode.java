@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_NAME(BAD_REQUEST, "이름은 1자에서 25자 사이여야 합니다."),
     INVALID_EXTENSION(BAD_REQUEST, "파일 확장자는 jpg, jpeg, png만 가능합니다."),
     INVALID_LOGIN_ID(BAD_REQUEST, "아이디는 1자에서 25자 사이여야 합니다."),
+    INVALID_PASSWORD(BAD_REQUEST, "비밀번호는 8자 이상의 영문, 숫자, 특수기호를 포함해야합니다."),
 
 
     /* 403 FORBIDDEN 권한 없음 */
@@ -26,6 +27,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(NOT_FOUND, "해당 게시글을 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(NOT_FOUND, "해당 댓글을 찾을 수 없습니다."),
     IMAGE_NOT_FOUND(NOT_FOUND, "해당 이미지를 찾을 수 없습니다."),
+    SECURITY_QUESTION_NOT_FOUND(NOT_FOUND,"해당 본인 확인 질문을 찾을 수 없습니다."),
 
     /* 409 CONFLICT 중복된 리소스 */
     ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 닉네임입니다."),
