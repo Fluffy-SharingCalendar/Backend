@@ -1,9 +1,8 @@
 package com.fluffy.SharingCalendar.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluffy.SharingCalendar.domain.User;
-import com.fluffy.SharingCalendar.exception.CustomException;
-import com.fluffy.SharingCalendar.service.UserService;
+import com.fluffy.SharingCalendar.user.domain.User;
+import com.fluffy.SharingCalendar.user.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,8 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-
-import static com.fluffy.SharingCalendar.exception.ErrorCode.INVALID_NICKNAME;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -37,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             User user = new ObjectMapper().readValue(body, User.class);
 
             // 닉네임 길이 유효성 검사
-            userService.validateNickname(user.getNickname());
+            userService.validateNickname(user.getLoginId());
 
             // 사용자 저장 및 토큰 생성
             userService.save(user);
@@ -58,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // JWT 토큰 검증
                 if (jwtUtil.isTokenValid(token)) {
                     String username = jwtUtil.getNickname(token);
-                    User user = userService.findByNickname(username); // 토큰에서 사용자 정보 추출 및 로드
+                    User user = userService.findByLoginId(username); // 토큰에서 사용자 정보 추출 및 로드
                     // SecurityContextHolder에 인증 정보 설정
                     SecurityContextHolder.getContext().setAuthentication(
                             new UsernamePasswordAuthenticationToken(

@@ -1,7 +1,7 @@
 package com.fluffy.SharingCalendar.config;
 
 import com.fluffy.SharingCalendar.filter.JwtAuthenticationFilter;
-import com.fluffy.SharingCalendar.service.UserService;
+import com.fluffy.SharingCalendar.user.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

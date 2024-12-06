@@ -1,9 +1,10 @@
 package com.fluffy.SharingCalendar.service;
 
-import com.fluffy.SharingCalendar.domain.Event;
-import com.fluffy.SharingCalendar.dto.EventDto;
-import com.fluffy.SharingCalendar.dto.response.EventDetailResponseDto;
-import com.fluffy.SharingCalendar.repository.CalendarRepository;
+import com.fluffy.SharingCalendar.calendar.domain.Event;
+import com.fluffy.SharingCalendar.calendar.service.EventService;
+import com.fluffy.SharingCalendar.calendar.dto.EventDto;
+import com.fluffy.SharingCalendar.calendar.dto.response.EventDetailResponseDto;
+import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
