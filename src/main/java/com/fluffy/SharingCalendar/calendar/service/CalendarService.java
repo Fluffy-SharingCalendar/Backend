@@ -9,8 +9,10 @@ import com.fluffy.SharingCalendar.calendar.domain.Calendar;
 import com.fluffy.SharingCalendar.calendar.domain.CalendarMember;
 import com.fluffy.SharingCalendar.calendar.dto.response.CalendarMemberResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.CalendarResponseDto;
+import com.fluffy.SharingCalendar.calendar.dto.response.CalendarSummaryResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.RegisterCalendarResponseDto;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarMemberRepository;
+import com.fluffy.SharingCalendar.calendar.repository.CalendarQuerydslRepository;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.common.image.S3Service;
 import com.fluffy.SharingCalendar.exception.CustomException;
@@ -32,6 +34,7 @@ public class CalendarService {
     private final CalendarRepository calendarRepository;
     private final CalendarMemberRepository calendarMemberRepository;
     private final UserQuerydslRepository userQuerydslRepository;
+    private final CalendarQuerydslRepository calendarQuerydslRepository;
     private final S3Service s3Service;
     private final UserService userService;
 
@@ -111,6 +114,11 @@ public class CalendarService {
         checkUserIncluded(calendarId, loginId);
 
         return userQuerydslRepository.findUsersWithCalendarStatus(calendarId, keyword);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CalendarSummaryResponseDto> getCalendarsByUser(Integer userId) {
+        return calendarQuerydslRepository.findCalendarsByUserId(userId);
     }
 
     private Calendar findByCalendarId(int calendarId) {
