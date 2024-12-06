@@ -1,5 +1,6 @@
 package com.fluffy.SharingCalendar.domain;
 
+import com.fluffy.SharingCalendar.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

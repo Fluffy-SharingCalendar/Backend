@@ -16,7 +16,7 @@ import java.util.List;
 import static com.fluffy.SharingCalendar.domain.QComment.comment;
 import static com.fluffy.SharingCalendar.domain.QPost.post;
 import static com.fluffy.SharingCalendar.domain.QPostImage.postImage;
-import static com.fluffy.SharingCalendar.domain.QUser.user;
+import static com.fluffy.SharingCalendar.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
@@ -30,8 +30,7 @@ public class PostQDslRepository {
                         PostDetail.class,
                         post.id,
                         post.author.id,
-                        post.author.nickname.as("authorNickname"),
-                        post.author.profileImageIndex.as("authorProfileImageNo"),
+                        post.author.name.as("authorNickname"),
                         post.content,
                         post.eventDate,
                         comment.count().intValue().as("commentCnt")

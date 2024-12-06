@@ -2,7 +2,7 @@ package com.fluffy.SharingCalendar.dto.request;
 
 import com.fluffy.SharingCalendar.domain.Comment;
 import com.fluffy.SharingCalendar.domain.Post;
-import com.fluffy.SharingCalendar.domain.User;
+import com.fluffy.SharingCalendar.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
