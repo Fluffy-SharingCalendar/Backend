@@ -24,7 +24,7 @@ public class UserQuerydslRepository {
                 .select(Projections.constructor(
                         CalendarMemberResponseDto.class,
                         user,
-                        calendarMember.status.coalesce("false") // 상태가 null이면 기본값 설정
+                        calendarMember.status.coalesce("uninvited") // 상태가 null이면 기본값 설정
                 ))
                 .from(user)
                 .leftJoin(calendarMember)

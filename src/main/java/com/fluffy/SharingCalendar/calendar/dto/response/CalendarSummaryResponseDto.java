@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public class CalendarSummaryResponseDto {
 
-    private final Integer calendarId;
+    private final int calendarId;
     private final String name;
     private final String profileImageUrl;
-    private final Integer participantsCount;
+    private final int participantsCount;
 
     @QueryProjection
     public CalendarSummaryResponseDto(Integer calendarId, String name, String profileImageUrl,

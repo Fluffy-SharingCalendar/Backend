@@ -86,7 +86,7 @@ public class CalendarService {
         Calendar calendar = findByCalendarId(calendarId);
         checkUserIncluded(calendarId, loginId);
 
-        checkDuplicateInvitation(calendarId, invitedUserId);
+        checkInvitationDuplicated(calendarId, invitedUserId);
         User user = userService.findByUserId(invitedUserId);
 
         CalendarMember member = CalendarMember.builder()
@@ -163,13 +163,13 @@ public class CalendarService {
         }
     }
 
-    private CalendarMember checkUserIncluded(Integer calendarId, String loginId) {
+    private CalendarMember checkUserIncluded(int calendarId, String loginId) {
         User loginUser = userService.findByLoginId(loginId);
         return calendarMemberRepository.findByCalendarIdAndUserId(calendarId, loginUser.getId())
                 .orElseThrow(() -> new CustomException(CALENDAR_MEMBER_NOT_FOUND));
     }
 
-    private void checkDuplicateInvitation(Integer calendarId, Integer userId) {
+    private void checkInvitationDuplicated(int calendarId, int userId) {
         calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId).ifPresent(member -> {
             throw new CustomException(ALREADY_INVITED_USER);
         });

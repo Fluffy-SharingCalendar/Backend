@@ -9,9 +9,9 @@ import java.time.LocalDate;
 @Getter
 @Builder
 public class EventDto {
-    private int eventId;
-    private String title;
-    private String color;
+    private final int eventId;
+    private final String title;
+    private final String color;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private LocalDate startDate;

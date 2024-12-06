@@ -10,10 +10,10 @@ import lombok.Getter;
 
 @Getter
 public class CalendarMemberResponseDto {
-    private Integer userId;
-    private String name;
-    private URL profileImageUrl;
-    private String status;  //false, invited, accepted
+    private final int userId;
+    private final String name;
+    private final URL profileImageUrl;
+    private final String status;  //uninvited, invited, accepted
 
     public CalendarMemberResponseDto(CalendarMember calendarMember) {
         this.userId = calendarMember.getUserId();

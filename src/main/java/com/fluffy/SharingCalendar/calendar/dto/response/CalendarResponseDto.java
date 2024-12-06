@@ -8,9 +8,9 @@ import lombok.Getter;
 
 @Getter
 public class CalendarResponseDto {
-    private String name;
-    private URL profileImageUrl;
-    private URL backgroundImage;
+    private final String name;
+    private final URL profileImageUrl;
+    private final URL backgroundImage;
 
     public CalendarResponseDto(Calendar calendar) {
         this.name = calendar.getName();

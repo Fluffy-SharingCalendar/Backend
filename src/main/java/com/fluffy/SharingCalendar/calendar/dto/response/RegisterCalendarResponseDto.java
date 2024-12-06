@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 public class RegisterCalendarResponseDto {
-    private int calendarId;
-    private int currentYear;
+    private final int calendarId;
+    private final int currentYear;
 
     public RegisterCalendarResponseDto(int calendarId) {
         this.calendarId = calendarId;
