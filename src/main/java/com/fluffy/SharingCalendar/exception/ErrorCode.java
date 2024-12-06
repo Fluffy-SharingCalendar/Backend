@@ -29,7 +29,7 @@ public enum ErrorCode {
     SECURITY_QUESTION_NOT_FOUND(NOT_FOUND,"해당 본인 확인 질문을 찾을 수 없습니다."),
 
     /* 409 CONFLICT 중복된 리소스 */
-    ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 닉네임입니다."),
+    ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 아이디입니다."),
 
     /* 413 Request Entity Too Large */
     MAX_FILE_SIZE_EXCEEDED(PAYLOAD_TOO_LARGE, "이미지 파일은 10MB이하여야합니다."),
