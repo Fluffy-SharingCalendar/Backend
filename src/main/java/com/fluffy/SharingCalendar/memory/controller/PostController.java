@@ -32,7 +32,7 @@ public class PostController {
     public ResponseEntity<Long> register(@PathVariable Integer eventId,
             @RequestHeader(value = "Authorization", required = false) String accessToken,
             @RequestBody RegisterPostRequestDto request) {
-        long postIndex = postService.register(eventId, request, jwtUtil.getNickname(accessToken));
+        long postIndex = postService.register(eventId, request, jwtUtil.getLoginId(accessToken));
         return ResponseEntity.ok(postIndex);
     }
 
@@ -50,14 +50,14 @@ public class PostController {
     public ResponseEntity<Void> modify(@PathVariable Integer postId,
             @RequestHeader(value = "Authorization", required = false) String accessToken,
             @RequestBody ModifyPostRequestDto request) {
-        postService.update(postId, request, jwtUtil.getNickname(accessToken));
+        postService.update(postId, request, jwtUtil.getLoginId(accessToken));
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> delete(@PathVariable Integer postId,
             @RequestHeader(value = "Authorization", required = false) String accessToken) {
-        postService.delete(postId, jwtUtil.getNickname(accessToken));
+        postService.delete(postId, jwtUtil.getLoginId(accessToken));
         return ResponseEntity.noContent().build();
     }
 }
