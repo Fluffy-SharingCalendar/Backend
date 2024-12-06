@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +29,14 @@ import static com.fluffy.SharingCalendar.exception.ErrorCode.*;
 @Service
 public class UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final SecurityQuestionRepository securityQuestionRepository;
     private final SecurityAnswerRepository securityAnswerRepository;
     private final JwtUtil jwtUtil;
 
-    public boolean checkLoginIdDuplicate(String loginId) {
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public boolean checkLoginIdDuplicated(String loginId) {
         if (userRepository.existsByLoginId(loginId)) {
             throw new CustomException(ALREADY_SAVED_DISPLAY);
         }
@@ -63,7 +66,6 @@ public class UserService {
         if (!matcher.matches()) {
             throw new CustomException(INVALID_PASSWORD);
         }
-
         return true;
     }
 
@@ -98,13 +100,18 @@ public class UserService {
     }
 
     private User createUser(RegisterUserRequestDto requestDto) {
-        return User.builder()
+
+        User user = User.builder()
                 .name(requestDto.getName())
                 .loginId(requestDto.getLoginId())
-                .password(requestDto.getPassword())
+                .password(requestDto.getPassword())  // 비밀번호는 평문으로 전달
                 .notificationStatus(true)
                 .isDeleted('N')
                 .build();
+
+        user.hashPassword(passwordEncoder);
+
+        return user;
     }
 
     private List<SecurityAnswer> createSecurityAnswers(List<SecurityAnswerDto> securityAnswerDtos, User user) {

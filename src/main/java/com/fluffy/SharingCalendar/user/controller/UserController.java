@@ -18,7 +18,7 @@ public class UserController {
     @PostMapping("/validation")
     public ResponseEntity<?> isLoginIdAvailable(@RequestBody CheckLoginIdRequestDto requestDto) {
         userService.validateLoginId(requestDto.getLoginId());
-        userService.checkLoginIdDuplicate(requestDto.getLoginId());
+        userService.checkLoginIdDuplicated(requestDto.getLoginId());
         return ResponseEntity.ok(Collections.singletonMap("message", "사용 가능한 아이디입니다."));
     }
 
@@ -26,7 +26,7 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody RegisterUserRequestDto requestDto) {
         userService.validateName(requestDto.getName());
         userService.validatePassword(requestDto.getPassword());
-        userService.checkLoginIdDuplicate(requestDto.getLoginId());
+        userService.checkLoginIdDuplicated(requestDto.getLoginId());
         userService.registerUser(requestDto);
         return ResponseEntity.ok(Collections.singletonMap("message", "회원가입이 완료되었습니다."));
     }
