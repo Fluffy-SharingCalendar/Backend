@@ -24,25 +24,23 @@ public class User {
     @Column(name = "user_id")
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 20)
     private String name;
 
-    @Column(name = "login_id")
+    @Column(name = "login_id", nullable = false, length = 20, unique = true)
     private String loginId;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "notification_status")
-    private boolean notificationStatus;
+    private boolean notificationStatus = true;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
-    private char isDeleted;
+    @Column(name = "is_deleted", nullable = false, length = 1)
+    private char isDeleted = 'N';
 
     public User hashPassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(this.password);

@@ -2,6 +2,7 @@ package com.fluffy.SharingCalendar.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fluffy.SharingCalendar.user.domain.User;
+import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
 import jakarta.servlet.FilterChain;

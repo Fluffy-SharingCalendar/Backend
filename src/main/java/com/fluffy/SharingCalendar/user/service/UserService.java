@@ -74,8 +74,14 @@ public class UserService {
     }
 
     @Transactional
-    public User findByLoginId(String nickname) {
-        return userRepository.findByLoginId(nickname)
+    public User findByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    @Transactional
+    public User findByUserId(int userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
