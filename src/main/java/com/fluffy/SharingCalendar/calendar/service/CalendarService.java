@@ -15,7 +15,7 @@ import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.common.image.S3Service;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.user.domain.User;
-import com.fluffy.SharingCalendar.user.repository.UserRepository;
+import com.fluffy.SharingCalendar.user.repository.UserQuerydslRepository;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class CalendarService {
 
     private final CalendarRepository calendarRepository;
     private final CalendarMemberRepository calendarMemberRepository;
-    private final UserRepository userRepository;
+    private final UserQuerydslRepository userQuerydslRepository;
     private final S3Service s3Service;
     private final UserService userService;
 
@@ -48,14 +48,16 @@ public class CalendarService {
     }
 
     @Transactional(readOnly = true)
-    public CalendarResponseDto findCalendarById(int calendarId) {
+    public CalendarResponseDto findCalendarById(int calendarId, String loginId) {
+        checkUserIncluded(calendarId, loginId);
         return new CalendarResponseDto(findByCalendarId(calendarId));
     }
 
     @Transactional
     public RegisterCalendarResponseDto updateCalendar(Integer calendarId, String newName,
-            MultipartFile newProfileImage) {
+            MultipartFile newProfileImage, String loginId) {
         Calendar calendar = findByCalendarId(calendarId);
+        checkUserIncluded(calendarId, loginId);
 
         calendar.changeName(newName);
         changeProfileImage(newProfileImage, calendar);
@@ -66,9 +68,7 @@ public class CalendarService {
 
     @Transactional
     public void leaveCalendar(Integer calendarId, String loginId) {
-        User user = userService.findByLoginId(loginId);
-
-        CalendarMember member = checkUserIncluded(calendarId, user.getId());
+        CalendarMember member = checkUserIncluded(calendarId, loginId);
         Calendar calendar = member.getCalendar();
         calendarMemberRepository.delete(member);
 
@@ -80,10 +80,10 @@ public class CalendarService {
     @Transactional
     public void inviteUserToCalendar(int calendarId, int invitedUserId, String loginId) {
         Calendar calendar = findByCalendarId(calendarId);
-        User loginUser = userService.findByLoginId(loginId);
-        User user = userService.findByUserId(invitedUserId);
+        checkUserIncluded(calendarId, loginId);
 
-        checkInvitation(calendarId, invitedUserId, loginUser.getId());
+        checkDuplicateInvitation(calendarId, invitedUserId);
+        User user = userService.findByUserId(invitedUserId);
 
         CalendarMember member = CalendarMember.builder()
                 .calendar(calendar)
@@ -93,23 +93,24 @@ public class CalendarService {
                 .status("invited")
                 .build();
 
-        calendarMemberRepository.save(member);
+        calendar.addMember(member);
     }
 
     @Transactional(readOnly = true)
-    public List<CalendarMemberResponseDto> getCalendarMembers(int calendarId) {
+    public List<CalendarMemberResponseDto> getCalendarMembers(int calendarId, String loginId) {
+        checkUserIncluded(calendarId, loginId);
+
         Calendar calendar = findByCalendarId(calendarId);
-        return calendarMemberRepository.findByCalendarId(calendar.getId())
-                .stream().map(CalendarMemberResponseDto::new)
+        return calendar.getMembers().stream()
+                .map(CalendarMemberResponseDto::new)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<CalendarMemberResponseDto> searchUsersByName(int calendarId, String keyword) {
-        return userRepository.findByNameContaining(keyword)
-                .stream()
-                .map(user -> new CalendarMemberResponseDto(user, isCalendarMember(calendarId, user.getId())))
-                .toList();
+    public List<CalendarMemberResponseDto> searchUsersByLoginId(int calendarId, String keyword, String loginId) {
+        checkUserIncluded(calendarId, loginId);
+
+        return userQuerydslRepository.findUsersWithCalendarStatus(calendarId, keyword);
     }
 
     private Calendar findByCalendarId(int calendarId) {
@@ -153,13 +154,9 @@ public class CalendarService {
         }
     }
 
-    private void checkInvitation(int calendarId, int userId, int loginUserId) {
-        checkUserIncluded(calendarId, loginUserId);
-        checkDuplicateInvitation(calendarId, userId);
-    }
-
-    private CalendarMember checkUserIncluded(Integer calendarId, Integer userId) {
-        return calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId)
+    private CalendarMember checkUserIncluded(Integer calendarId, String loginId) {
+        User loginUser = userService.findByLoginId(loginId);
+        return calendarMemberRepository.findByCalendarIdAndUserId(calendarId, loginUser.getId())
                 .orElseThrow(() -> new CustomException(CALENDAR_MEMBER_NOT_FOUND));
     }
 
@@ -167,13 +164,5 @@ public class CalendarService {
         calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId).ifPresent(member -> {
             throw new CustomException(ALREADY_INVITED_USER);
         });
-    }
-
-    private String isCalendarMember(Integer calendarId, Integer userId) {
-        if(calendarMemberRepository.findByCalendarIdAndUserId(calendarId, userId).isPresent()) {
-            return "true";
-        }
-
-        return "false";
     }
 }

@@ -57,6 +57,11 @@ public class Calendar {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void addMember(CalendarMember member) {
+        members.add(member);
+        member.setCalendar(this);
+    }
+
     private void validateName(String name) {
         if (name.isBlank() || name.length() <= 1 || name.length() > 25) {
             throw new CustomException(INVALID_CALENDAR_NAME);
