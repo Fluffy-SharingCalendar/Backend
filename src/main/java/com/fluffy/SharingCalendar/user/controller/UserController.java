@@ -24,9 +24,6 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> registerUser(@RequestBody RegisterUserRequestDto requestDto) {
-        userService.validateName(requestDto.getName());
-        userService.validatePassword(requestDto.getPassword());
-        userService.checkLoginIdDuplicated(requestDto.getLoginId());
         userService.registerUser(requestDto);
         return ResponseEntity.ok(Collections.singletonMap("message", "회원가입이 완료되었습니다."));
     }

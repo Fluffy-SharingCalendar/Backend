@@ -16,10 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +33,7 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder;
 
+    @Transactional
     public boolean checkLoginIdDuplicated(String loginId) {
         if (userRepository.existsByLoginId(loginId)) {
             throw new CustomException(ALREADY_SAVED_DISPLAY);
@@ -43,6 +41,7 @@ public class UserService {
         return true;
     }
 
+    @Transactional
     public boolean validateLoginId(String loginId) {
         if (loginId.length() < 1 || loginId.length() > 25) {
             throw new CustomException(INVALID_LOGIN_ID);
@@ -50,6 +49,7 @@ public class UserService {
         return true;
     }
 
+    @Transactional
     public boolean validateName(String name) {
         if (name.length() < 1 || name.length() > 25) {
             throw new CustomException(INVALID_NAME);
@@ -57,7 +57,7 @@ public class UserService {
         return true;
     }
 
-    public boolean validatePassword(String password) {
+    private boolean validatePassword(String password) {
         // 비밀번호 유효성 검사: 8자 이상, 영문(대문자/소문자), 숫자, 특수기호 포함
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,20}$";
         Pattern pattern = Pattern.compile(regex);
@@ -69,6 +69,7 @@ public class UserService {
         return true;
     }
 
+    @Transactional
     public void save(User user) {
         userRepository.save(user);
     }
@@ -85,24 +86,35 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
+    @Transactional
     public UserInfoDto getUserInfo(String token) {
         String loginId = jwtUtil.getLoginId(token);
-        User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        User user = findByLoginId(loginId);
 
         return UserInfoDto.builder()
                 .name(user.getName())
                 .loginId(user.getLoginId())
-                .notificationStatus(true)
+                .notificationStatus(user.isNotificationStatus())
                 .build();
     }
 
+    @Transactional
     public void registerUser(RegisterUserRequestDto requestDto) {
+        validateRegistrationData(requestDto);
+
         User user = createUser(requestDto);
         userRepository.save(user);
 
         List<SecurityAnswer> securityAnswers = createSecurityAnswers(requestDto.getSecurityAnswers(), user);
         securityAnswerRepository.saveAll(securityAnswers);
+    }
+
+    private void validateRegistrationData(RegisterUserRequestDto requestDto){
+        validateName(requestDto.getName());
+        validateLoginId(requestDto.getLoginId());
+        validatePassword(requestDto.getPassword());
+        checkLoginIdDuplicated(requestDto.getLoginId());
     }
 
     private User createUser(RegisterUserRequestDto requestDto) {
@@ -123,8 +135,8 @@ public class UserService {
     private List<SecurityAnswer> createSecurityAnswers(List<SecurityAnswerDto> securityAnswerDtos, User user) {
         return securityAnswerDtos.stream()
                 .map(securityAnswerDto -> {
-                    SecurityQuestion securityQuestion = findSecurityQuestion(securityAnswerDto.getQuestionId());
-                    return buildSecurityAnswer(securityAnswerDto, user, securityQuestion);
+                    SecurityQuestion securityQuestion = findSecurityQuestion(securityAnswerDto.questionId());
+                    return createSecurityAnswer(securityAnswerDto, user, securityQuestion);
                 })
                 .collect(Collectors.toList());
     }
@@ -134,9 +146,9 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(SECURITY_QUESTION_NOT_FOUND));
     }
 
-    private SecurityAnswer buildSecurityAnswer(SecurityAnswerDto securityAnswerDto, User user, SecurityQuestion securityQuestion) {
+    private SecurityAnswer createSecurityAnswer(SecurityAnswerDto securityAnswerDto, User user, SecurityQuestion securityQuestion) {
         return SecurityAnswer.builder()
-                .answer(securityAnswerDto.getAnswer())
+                .answer(securityAnswerDto.answer())
                 .user(user)
                 .question(securityQuestion)
                 .build();
