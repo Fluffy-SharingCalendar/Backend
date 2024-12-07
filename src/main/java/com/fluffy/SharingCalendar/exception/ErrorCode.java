@@ -17,6 +17,9 @@ public enum ErrorCode {
     INVALID_LOGIN_ID(BAD_REQUEST, "아이디는 1자에서 25자 사이여야 합니다."),
     INVALID_PASSWORD(BAD_REQUEST, "비밀번호는 대문자, 소문자, 숫자, 특수문자가 포함된 8~20자의 비밀번호여야 합니다."),
 
+    /* 401 UNAUTHORIZED 인증 실패 */
+    INVALID_CREDENTIALS(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+
     /* 403 FORBIDDEN 권한 없음 */
     NO_PERMISSION_FOR_MODIFICATION(FORBIDDEN, "해당 작업의 수정/삭제 권한이 없습니다."),
 

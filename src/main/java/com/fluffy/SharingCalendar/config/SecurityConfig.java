@@ -32,7 +32,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/login").permitAll()     // 로그인은 허용
                         .requestMatchers(HttpMethod.POST, "/api/users/validation").permitAll() // 닉네임 중복 검사 허용
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // 회원가입 허용
+                        .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
