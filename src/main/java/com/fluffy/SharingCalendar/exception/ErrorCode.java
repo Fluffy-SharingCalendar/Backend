@@ -11,10 +11,11 @@ import static org.springframework.http.HttpStatus.*;
 public enum ErrorCode {
     /* 400 BAD_REQUEST 잘못된 요청 */
     INVALID_PARAMETER(BAD_REQUEST, "파라미터 값을 확인해주세요."),
-    INVALID_NICKNAME(BAD_REQUEST, "닉네임은 1자에서 25자 사이여야 합니다."),
+    INVALID_NAME(BAD_REQUEST, "이름은 1자에서 25자 사이여야 합니다."),
     INVALID_CALENDAR_NAME(BAD_REQUEST, "캘린더 이름은 1~25자 사이여야 합니다."),
     INVALID_EXTENSION(BAD_REQUEST, "파일 확장자는 jpg, jpeg, png만 가능합니다."),
-
+    INVALID_LOGIN_ID(BAD_REQUEST, "아이디는 1자에서 25자 사이여야 합니다."),
+    INVALID_PASSWORD(BAD_REQUEST, "비밀번호는 대문자, 소문자, 숫자, 특수문자가 포함된 8~20자의 비밀번호여야 합니다."),
 
     /* 403 FORBIDDEN 권한 없음 */
     NO_PERMISSION_FOR_MODIFICATION(FORBIDDEN, "해당 작업의 수정/삭제 권한이 없습니다."),
@@ -27,9 +28,10 @@ public enum ErrorCode {
     POST_NOT_FOUND(NOT_FOUND, "해당 게시글을 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(NOT_FOUND, "해당 댓글을 찾을 수 없습니다."),
     IMAGE_NOT_FOUND(NOT_FOUND, "해당 이미지를 찾을 수 없습니다."),
+    SECURITY_QUESTION_NOT_FOUND(NOT_FOUND,"해당 본인 확인 질문을 찾을 수 없습니다."),
 
     /* 409 CONFLICT 중복된 리소스 */
-    ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 닉네임입니다."),
+    ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 아이디입니다."),
     ALREADY_INVITED_USER(CONFLICT,"이미 초대된 사용자입니다."),
 
     /* 413 Request Entity Too Large */

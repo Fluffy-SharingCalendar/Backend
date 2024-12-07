@@ -1,6 +1,7 @@
 package com.fluffy.SharingCalendar.user.controller;
 
-import com.fluffy.SharingCalendar.user.dto.CheckNicknameRequestDto;
+import com.fluffy.SharingCalendar.user.dto.request.CheckLoginIdRequestDto;
+import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,16 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/validation")
-    public ResponseEntity<?> isNicknameAvailable(@RequestBody CheckNicknameRequestDto requestDto) {
-        userService.checkNickname(requestDto.getNickname());
-        return ResponseEntity.ok(Collections.singletonMap("message", "사용 가능한 닉네임입니다."));
+    public ResponseEntity<?> isLoginIdAvailable(@RequestBody CheckLoginIdRequestDto requestDto) {
+        userService.validateLoginId(requestDto.getLoginId());
+        userService.checkLoginIdDuplicated(requestDto.getLoginId());
+        return ResponseEntity.ok(Collections.singletonMap("message", "사용 가능한 아이디입니다."));
     }
+
+    @PostMapping
+    public ResponseEntity<?> registerUser(@RequestBody RegisterUserRequestDto requestDto) {
+        userService.registerUser(requestDto);
+        return ResponseEntity.ok(Collections.singletonMap("message", "회원가입이 완료되었습니다."));
+    }
+
 }

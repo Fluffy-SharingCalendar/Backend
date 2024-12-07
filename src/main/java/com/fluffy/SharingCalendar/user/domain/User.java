@@ -1,46 +1,57 @@
 package com.fluffy.SharingCalendar.user.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
+@Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "user")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Integer id;
 
+    @Column(name = "name", nullable = false, length = 20)
+    private String name;
+
     @Column(name = "login_id", nullable = false, length = 20, unique = true)
     private String loginId;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 20)
-    private String name;
+    @Column(name = "notification_status")
+    private boolean notificationStatus;
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private Boolean notificationStatus = true;
+    @Column(name = "is_deleted", nullable = false, length = 1)
+    private char isDeleted;
 
-    @Column(nullable = false, length = 1)
-    private char isDeleted = 'N';
+    public User hashPassword(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+        return this;
+    }
+
+    public boolean checkPassword(String plainPassword, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(plainPassword, this.password);
+    }
+
 
 }

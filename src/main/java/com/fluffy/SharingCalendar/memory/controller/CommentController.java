@@ -23,7 +23,7 @@ public class CommentController {
     public ResponseEntity<Void> register(@PathVariable Integer postId,
                                          @RequestHeader(value = "Authorization", required = false) String accessToken,
                                          @Validated @RequestBody CommentRequestDto request) {
-        commentService.register(postId, request, jwtUtil.getNickname(accessToken));
+        commentService.register(postId, request, jwtUtil.getLoginId(accessToken));
         return ResponseEntity.noContent().build();
     }
 
@@ -37,14 +37,14 @@ public class CommentController {
     public ResponseEntity<Void> modify(@PathVariable Integer commentId,
                                        @RequestHeader(value = "Authorization", required = false) String accessToken,
                                        @Validated @RequestBody CommentRequestDto request) {
-        commentService.update(commentId, request.getContent(), jwtUtil.getNickname(accessToken));
+        commentService.update(commentId, request.getContent(), jwtUtil.getLoginId(accessToken));
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(@PathVariable Integer commentId,
                                        @RequestHeader(value = "Authorization", required = false) String accessToken) {
-        commentService.delete(commentId, jwtUtil.getNickname(accessToken));
+        commentService.delete(commentId, jwtUtil.getLoginId(accessToken));
         return ResponseEntity.noContent().build();
     }
 }
