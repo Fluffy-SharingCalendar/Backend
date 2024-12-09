@@ -3,6 +3,7 @@ package com.fluffy.SharingCalendar.config;
 import com.fluffy.SharingCalendar.filter.JwtAuthenticationFilter;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import com.fluffy.SharingCalendar.util.JwtUtil;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,7 +37,20 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
 
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/api/users/logout") // 로그아웃 엔드포인트
+                        .logoutSuccessUrl("/login")     // 로그아웃 후 리다이렉트할 URL
+                        .invalidateHttpSession(true)          // 세션 무효화
+                        .deleteCookies("JSESSIONID", "access_token")          // 쿠키 삭제
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            // 로그아웃 성공 시 클라이언트에 응답
+                            response.setStatus(200);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\": \"로그아웃 성공\"}");
+                        })
+                )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
+
 
         return http.build();
     }
