@@ -18,6 +18,7 @@ public class EventDetailResponseDto {
     private final LocalDate endDate;
 
     private final String color;
+
     private final URL randomImageUrl;
 
     public EventDetailResponseDto(EventDto eventDto, URL randomImageUrl) {

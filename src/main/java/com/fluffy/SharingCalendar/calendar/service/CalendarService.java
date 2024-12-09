@@ -51,17 +51,22 @@ public class CalendarService {
     }
 
     @Transactional(readOnly = true)
-    public CalendarResponseDto findCalendarById(int calendarId, String loginId) {
+    public Calendar checkAndFindCalendarById(int calendarId, String loginId) {
         Calendar calendar = findByCalendarId(calendarId);
         checkUserIncluded(calendarId, loginId);
+        return calendar;
+    }
+
+    @Transactional(readOnly = true)
+    public CalendarResponseDto findCalendarById(int calendarId, String loginId) {
+        Calendar calendar = checkAndFindCalendarById(calendarId, loginId);
         return new CalendarResponseDto(calendar);
     }
 
     @Transactional
     public RegisterCalendarResponseDto updateCalendar(Integer calendarId, String newName,
             MultipartFile newProfileImage, String loginId) {
-        Calendar calendar = findByCalendarId(calendarId);
-        checkUserIncluded(calendarId, loginId);
+        Calendar calendar = checkAndFindCalendarById(calendarId, loginId);
 
         calendar.changeName(newName);
         changeProfileImage(newProfileImage, calendar);
@@ -83,8 +88,7 @@ public class CalendarService {
 
     @Transactional
     public void inviteUserToCalendar(int calendarId, int invitedUserId, String loginId) {
-        Calendar calendar = findByCalendarId(calendarId);
-        checkUserIncluded(calendarId, loginId);
+        Calendar calendar = checkAndFindCalendarById(calendarId, loginId);
 
         checkInvitationDuplicated(calendarId, invitedUserId);
         User user = userService.findByUserId(invitedUserId);
@@ -102,8 +106,7 @@ public class CalendarService {
 
     @Transactional(readOnly = true)
     public List<CalendarMemberResponseDto> getCalendarMembers(int calendarId, String loginId) {
-        Calendar calendar = findByCalendarId(calendarId);
-        checkUserIncluded(calendarId, loginId);
+        Calendar calendar = checkAndFindCalendarById(calendarId, loginId);
 
         return calendar.getMembers().stream()
                 .map(CalendarMemberResponseDto::new)
