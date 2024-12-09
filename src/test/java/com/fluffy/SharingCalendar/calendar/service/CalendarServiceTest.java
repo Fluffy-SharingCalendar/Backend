@@ -20,7 +20,6 @@ import com.fluffy.SharingCalendar.common.image.S3Service;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.user.domain.User;
 import com.fluffy.SharingCalendar.user.repository.UserRepository;
-import com.fluffy.SharingCalendar.user.service.UserService;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -99,7 +98,7 @@ public class CalendarServiceTest {
         // Given
 
         // When
-        CalendarResponseDto response = calendarService.findCalendarById(calendar.getId(), "testUser");
+        CalendarResponseDto response = calendarService.findCalendarInfoById(calendar.getId(), "testUser");
 
         // Then
         assertNotNull(response);
@@ -120,7 +119,7 @@ public class CalendarServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            calendarService.findCalendarById(calendar.getId(), "nonMemberUser");
+            calendarService.findCalendarInfoById(calendar.getId(), "nonMemberUser");
         });
         assertEquals(CALENDAR_MEMBER_NOT_FOUND, exception.getErrorCode());
     }
@@ -129,7 +128,7 @@ public class CalendarServiceTest {
     public void 캘린더_조회_없는_캘린더() {
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            calendarService.findCalendarById(99, "testUser");
+            calendarService.findCalendarInfoById(99, "testUser");
         });
         assertEquals(CALENDAR_NOT_FOUND, exception.getErrorCode());
     }

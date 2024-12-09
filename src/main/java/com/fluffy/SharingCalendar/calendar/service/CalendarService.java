@@ -58,7 +58,7 @@ public class CalendarService {
     }
 
     @Transactional(readOnly = true)
-    public CalendarResponseDto findCalendarById(int calendarId, String loginId) {
+    public CalendarResponseDto findCalendarInfoById(int calendarId, String loginId) {
         Calendar calendar = checkAndFindCalendarById(calendarId, loginId);
         return new CalendarResponseDto(calendar);
     }

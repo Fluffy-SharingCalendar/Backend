@@ -48,18 +48,18 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventDto> getEventsForCalendar(int calendarId) {
+    public List<EventDto> getEventsForCalendar(int calendarId, int year, int month) {
         validateCalendarExists(calendarId);
 
-        return eventRepository.findByCalendarId(calendarId).stream()
-                .map(this::toEventDto)
+        return eventQDslRepository.findEventsByCalendarAndMonth(calendarId, year, month).stream()
+                .map(EventDto :: new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public EventDetailResponseDto getEventDetails(int eventId) {
         EventDto eventDto = eventRepository.findById(eventId)
-                .map(this::toEventDto)
+                .map(EventDto :: new)
                 .orElseThrow(() -> new CustomException(EVENT_NOT_FOUND));
 
         URL url = getRandomImageForEvent(eventId);
@@ -97,13 +97,4 @@ public class EventService {
         }
     }
 
-    private EventDto toEventDto(Event event) {
-        return EventDto.builder()
-                .eventId(event.getEventId())
-                .title(event.getTitle())
-                .color(event.getColor())
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .build();
-    }
 }
