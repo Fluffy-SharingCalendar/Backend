@@ -48,8 +48,8 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventDto> getEventsForCalendar(int calendarId, int year, int month) {
-        validateCalendarExists(calendarId);
+    public List<EventDto> getEventsForCalendar(int calendarId, int year, int month, String loginId) {
+        calendarService.checkAndFindCalendarById(calendarId, loginId);
 
         return eventQDslRepository.findEventsByCalendarAndMonth(calendarId, year, month).stream()
                 .map(EventDto :: new)
@@ -90,11 +90,4 @@ public class EventService {
             });
         }
     }
-
-    private void validateCalendarExists(int calendarId) {
-        if (!calendarRepository.existsById(calendarId)) {
-            throw new CustomException(CALENDAR_NOT_FOUND);
-        }
-    }
-
 }
