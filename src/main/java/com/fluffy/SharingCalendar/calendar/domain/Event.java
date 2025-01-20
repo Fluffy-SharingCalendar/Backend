@@ -1,5 +1,6 @@
 package com.fluffy.SharingCalendar.calendar.domain;
 
+import com.fluffy.SharingCalendar.calendar.dto.resquest.UpdateEventRequestDto;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,4 +42,19 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventParticipant> participants = new ArrayList<>();
+
+    public void update(UpdateEventRequestDto request) {
+        if (request.getTitle() != null) {
+            this.title = request.getTitle();
+        }
+        if (request.getStartDate() != null) {
+            this.startDate = request.getStartDate();
+        }
+        if (request.getEndDate() != null) {
+            this.endDate = request.getEndDate();
+        }
+        if (request.getColor() != null) {
+            this.color = request.getColor();
+        }
+    }
 }

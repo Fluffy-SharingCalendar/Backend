@@ -1,7 +1,6 @@
 package com.fluffy.SharingCalendar.calendar.service;
 
 import static com.fluffy.SharingCalendar.common.Constant.DEFAULT_PROFILE_IMAGE_URL;
-import static com.fluffy.SharingCalendar.exception.ErrorCode.CALENDAR_NOT_FOUND;
 import static com.fluffy.SharingCalendar.exception.ErrorCode.EVENT_NOT_FOUND;
 
 import com.fluffy.SharingCalendar.calendar.domain.Calendar;
@@ -10,6 +9,7 @@ import com.fluffy.SharingCalendar.calendar.domain.EventParticipant;
 import com.fluffy.SharingCalendar.calendar.dto.EventDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.EventDetailResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.resquest.RegisterEventRequestDto;
+import com.fluffy.SharingCalendar.calendar.dto.resquest.UpdateEventRequestDto;
 import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
 import com.fluffy.SharingCalendar.calendar.repository.EventParticipantRepository;
 import com.fluffy.SharingCalendar.calendar.repository.EventQDslRepository;
@@ -43,7 +43,7 @@ public class EventService {
         Event event = request.toEvent(calendar);
         Event savedEvent = eventRepository.save(event);
 
-        saveParticipant(savedEvent, request.getParticipantsIds());
+        saveParticipants(savedEvent, request.getParticipantsIds());
 
     }
 
@@ -67,6 +67,23 @@ public class EventService {
         return new EventDetailResponseDto(eventDto, url);
     }
 
+    @Transactional
+    public void updateEvent(int eventId, UpdateEventRequestDto request, String loginId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new CustomException(EVENT_NOT_FOUND));
+
+        calendarService.checkAndFindCalendarById(event.getCalendar().getId(), loginId);
+
+        event.update(request);
+
+        if (request.getParticipantsIds() != null) {
+            eventParticipantRepository.deleteByEvent(event);
+            saveParticipants(event, request.getParticipantsIds());
+        }
+
+        eventRepository.save(event);
+    }
+
     public URL getRandomImageForEvent(int eventId) {
         List<URL> images = eventQDslRepository.findImagesByEventId(eventId);
 
@@ -78,7 +95,7 @@ public class EventService {
         return images.get(random.nextInt(images.size()));
     }
 
-    private void saveParticipant(Event event, List<Integer> participantIds) {
+    private void saveParticipants(Event event, List<Integer> participantIds) {
         if (participantIds != null && !participantIds.isEmpty()) {
             participantIds.forEach(userId -> {
                 User user = userService.findByUserId(userId);
