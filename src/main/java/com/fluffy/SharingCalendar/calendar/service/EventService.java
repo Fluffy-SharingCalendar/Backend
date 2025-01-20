@@ -52,14 +52,14 @@ public class EventService {
         calendarService.checkAndFindCalendarById(calendarId, loginId);
 
         return eventQDslRepository.findEventsByCalendarAndMonth(calendarId, year, month).stream()
-                .map(EventDto :: new)
+                .map(EventDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public EventDetailResponseDto getEventDetails(int eventId) {
         EventDto eventDto = eventRepository.findById(eventId)
-                .map(EventDto :: new)
+                .map(EventDto::new)
                 .orElseThrow(() -> new CustomException(EVENT_NOT_FOUND));
 
         URL url = getRandomImageForEvent(eventId);
@@ -69,10 +69,7 @@ public class EventService {
 
     @Transactional
     public void updateEvent(int eventId, UpdateEventRequestDto request, String loginId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new CustomException(EVENT_NOT_FOUND));
-
-        calendarService.checkAndFindCalendarById(event.getCalendar().getId(), loginId);
+        Event event = checkPermission(eventId, loginId);
 
         event.update(request);
 
@@ -82,6 +79,12 @@ public class EventService {
         }
 
         eventRepository.save(event);
+    }
+
+    @Transactional
+    public void deleteEvent(int eventId, String loginId) {
+        Event event = checkPermission(eventId, loginId);
+        eventRepository.delete(event);
     }
 
     public URL getRandomImageForEvent(int eventId) {
@@ -106,5 +109,14 @@ public class EventService {
                 eventParticipantRepository.save(participant);
             });
         }
+    }
+
+    private Event checkPermission(int eventId, String loginId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new CustomException(EVENT_NOT_FOUND));
+
+        calendarService.checkAndFindCalendarById(event.getCalendar().getId(), loginId);
+
+        return event;
     }
 }
