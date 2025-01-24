@@ -5,6 +5,7 @@ import com.fluffy.SharingCalendar.domain.SecurityQuestion;
 import com.fluffy.SharingCalendar.user.domain.User;
 import com.fluffy.SharingCalendar.user.dto.SecurityAnswerDto;
 import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
+import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
 import com.fluffy.SharingCalendar.user.repository.SecurityAnswerRepository;
@@ -152,5 +153,13 @@ public class UserService {
                 .user(user)
                 .question(securityQuestion)
                 .build();
+    }
+
+    public String login(LoginRequestDto requestDto) {
+        User user = findByLoginId(requestDto.getLoginId());
+        if(!user.checkPassword(requestDto.getPassword(), passwordEncoder)){
+            throw new CustomException(INVALID_CREDENTIALS);
+        }
+        return jwtUtil.generateToken(user);
     }
 }

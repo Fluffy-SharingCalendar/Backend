@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CheckLoginIdRequestDto {
+public class LoginRequestDto {
     private final String loginId;
+    private final String password;
 }
