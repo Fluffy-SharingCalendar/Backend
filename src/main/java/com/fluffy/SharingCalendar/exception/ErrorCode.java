@@ -24,6 +24,7 @@ public enum ErrorCode {
 
     /* 403 FORBIDDEN 권한 없음 */
     NO_PERMISSION_FOR_MODIFICATION(FORBIDDEN, "해당 작업의 수정/삭제 권한이 없습니다."),
+    DEACTIVATED_USER(FORBIDDEN, "탈퇴한 회원입니다."),
 
     /* 404 NOT_FOUND 잘못된 리소스 접근 */
     CALENDAR_NOT_FOUND(NOT_FOUND, "해당 캘린더를 찾을 수 없습니다."),

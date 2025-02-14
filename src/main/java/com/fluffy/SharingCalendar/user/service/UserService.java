@@ -96,6 +96,8 @@ public class UserService {
 
         User user = findByLoginId(loginId);
 
+        checkIfUserIsDeleted(user);
+
         return UserInfoDto.builder()
                 .name(user.getName())
                 .loginId(user.getLoginId())
@@ -172,10 +174,19 @@ public class UserService {
 
     public String login(LoginRequestDto requestDto) {
         User user = findByLoginId(requestDto.getLoginId());
+
+        checkIfUserIsDeleted(user);
+
         if(!user.checkPassword(requestDto.getPassword(), passwordEncoder)){
             throw new CustomException(INVALID_CREDENTIALS);
         }
         return jwtUtil.generateToken(user);
+    }
+
+    private void checkIfUserIsDeleted(User user) {
+        if (user.getIsDeleted() == 'Y') {
+            throw new CustomException(DEACTIVATED_USER);
+        }
     }
 
     @Transactional
@@ -188,6 +199,8 @@ public class UserService {
         }
 
         User user = findByLoginId(loginIdFromToken);
+
+        checkIfUserIsDeleted(user);
 
         SecurityAnswer securityAnswer = securityAnswerRepository.findByUserAndQuestionId(user, requestDto.getQuestionId())
                 .orElseThrow(() -> new CustomException(SECURITY_QUESTION_NOT_FOUND));
@@ -205,6 +218,7 @@ public class UserService {
 
         User user = findByLoginId(loginId);
 
+        checkIfUserIsDeleted(user);
         validatePassword(newPassword);
 
         user.setPassword(newPassword);
@@ -218,6 +232,7 @@ public class UserService {
         String loginId = jwtUtil.getLoginId(token);
 
         User user = findByLoginId(loginId);
+        checkIfUserIsDeleted(user);
 
         if (!user.checkPassword(password, passwordEncoder)) {
             throw new CustomException(INVALID_CREDENTIALS);
