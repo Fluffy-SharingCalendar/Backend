@@ -8,11 +8,14 @@ import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
 import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.user.dto.request.VerifyUserIdentityRequestDto;
 import com.fluffy.SharingCalendar.user.repository.SecurityAnswerRepository;
 import com.fluffy.SharingCalendar.user.repository.SecurityQuestionRepository;
 import com.fluffy.SharingCalendar.user.repository.UserRepository;
 import com.fluffy.SharingCalendar.util.JwtUtil;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -104,11 +107,23 @@ public class UserService {
     public void registerUser(RegisterUserRequestDto requestDto) {
         validateRegistrationData(requestDto);
 
+        checkDuplicateSecurityAnswers(requestDto.getSecurityAnswers());
+
         User user = createUser(requestDto);
         userRepository.save(user);
 
         List<SecurityAnswer> securityAnswers = createSecurityAnswers(requestDto.getSecurityAnswers(), user);
         securityAnswerRepository.saveAll(securityAnswers);
+    }
+
+    private void checkDuplicateSecurityAnswers(List<SecurityAnswerDto> securityAnswers) {
+        Set<Integer> seenQuestionIds = new HashSet<>();
+
+        for (SecurityAnswerDto answerDto : securityAnswers) {
+            if (!seenQuestionIds.add(answerDto.questionId())) {
+                throw new CustomException(SECURITY_ANSWER_DUPLICATED); // 중복된 questionId가 있을 경우 예외 발생
+            }
+        }
     }
 
     private void validateRegistrationData(RegisterUserRequestDto requestDto){
@@ -162,4 +177,27 @@ public class UserService {
         }
         return jwtUtil.generateToken(user);
     }
+
+    @Transactional
+    public boolean verifySecurityAnswer(String token, VerifyUserIdentityRequestDto requestDto) {
+        String loginIdFromToken = jwtUtil.getLoginId(token);
+        String loginIdFromRequest = requestDto.getLoginId();
+
+        if (!loginIdFromToken.equals(loginIdFromRequest)) {
+            throw new CustomException(MISMATCHED_LOGIN_ID);
+        }
+
+        User user = findByLoginId(loginIdFromToken);
+
+        SecurityAnswer securityAnswer = securityAnswerRepository.findByUserAndQuestionId(user, requestDto.getQuestionId())
+                .orElseThrow(() -> new CustomException(SECURITY_QUESTION_NOT_FOUND));
+
+        if (!securityAnswer.getAnswer().equals(requestDto.getAnswer())) {
+            throw new CustomException(INVALID_SECURITY_ANSWER);
+        }
+
+        return true;
+    }
+
+
 }

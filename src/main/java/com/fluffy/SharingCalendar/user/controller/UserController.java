@@ -4,6 +4,7 @@ import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
 import com.fluffy.SharingCalendar.user.dto.request.CheckLoginIdRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
+import com.fluffy.SharingCalendar.user.dto.request.VerifyUserIdentityRequestDto;
 import com.fluffy.SharingCalendar.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +49,15 @@ public class UserController {
 
         UserInfoDto userInfo = userService.getUserInfo(jwtToken);
         return ResponseEntity.ok(userInfo);
+    }
+
+    @PostMapping("/verification")
+    public ResponseEntity<?> verifyUserIdentity(@RequestBody VerifyUserIdentityRequestDto requestDto, @RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        boolean isVerified = userService.verifySecurityAnswer(jwtToken, requestDto);
+
+        return isVerified ? ResponseEntity.ok().build() : ResponseEntity.status(400).build();
     }
 
 }

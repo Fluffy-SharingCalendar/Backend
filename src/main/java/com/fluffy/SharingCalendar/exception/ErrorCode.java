@@ -19,6 +19,8 @@ public enum ErrorCode {
 
     /* 401 UNAUTHORIZED 인증 실패 */
     INVALID_CREDENTIALS(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    INVALID_SECURITY_ANSWER(UNAUTHORIZED, "본인확인 질문 대답이 일치하지 않습니다."),
+    MISMATCHED_LOGIN_ID(UNAUTHORIZED, "아이디가 일치하지 않습니다."),
 
     /* 403 FORBIDDEN 권한 없음 */
     NO_PERMISSION_FOR_MODIFICATION(FORBIDDEN, "해당 작업의 수정/삭제 권한이 없습니다."),
@@ -36,6 +38,7 @@ public enum ErrorCode {
     /* 409 CONFLICT 중복된 리소스 */
     ALREADY_SAVED_DISPLAY(CONFLICT, "이미 존재하는 아이디입니다."),
     ALREADY_INVITED_USER(CONFLICT,"이미 초대된 사용자입니다."),
+    SECURITY_ANSWER_DUPLICATED(CONFLICT, "이미 선택된 본인 확인 질문입니다."),
 
     /* 413 Request Entity Too Large */
     MAX_FILE_SIZE_EXCEEDED(PAYLOAD_TOO_LARGE, "이미지 파일은 30MB이하여야합니다."),
