@@ -1,8 +1,6 @@
 package com.fluffy.SharingCalendar.calendar.dto.resquest;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fluffy.SharingCalendar.calendar.domain.Calendar;
-import com.fluffy.SharingCalendar.calendar.domain.Event;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,15 +41,5 @@ public class RegisterEventRequestDto {
     @AssertTrue(message = "시작일은 종료일보다 앞서거나 같아야 합니다.")
     public boolean isValidDateRange() {
         return startDate == null || endDate == null || !startDate.isAfter(endDate);
-    }
-
-    public Event toEvent(Calendar calendar) {
-        return Event.builder()
-                .calendar(calendar)
-                .title(this.title)
-                .startDate(this.startDate)
-                .endDate(this.endDate)
-                .color(this.color)
-                .build();
     }
 }

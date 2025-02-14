@@ -5,13 +5,10 @@ import static com.fluffy.SharingCalendar.exception.ErrorCode.EVENT_NOT_FOUND;
 
 import com.fluffy.SharingCalendar.calendar.domain.Calendar;
 import com.fluffy.SharingCalendar.calendar.domain.Event;
-import com.fluffy.SharingCalendar.calendar.domain.EventParticipant;
 import com.fluffy.SharingCalendar.calendar.dto.EventDto;
 import com.fluffy.SharingCalendar.calendar.dto.response.EventDetailResponseDto;
 import com.fluffy.SharingCalendar.calendar.dto.resquest.RegisterEventRequestDto;
 import com.fluffy.SharingCalendar.calendar.dto.resquest.UpdateEventRequestDto;
-import com.fluffy.SharingCalendar.calendar.repository.CalendarRepository;
-import com.fluffy.SharingCalendar.calendar.repository.EventParticipantRepository;
 import com.fluffy.SharingCalendar.calendar.repository.EventQDslRepository;
 import com.fluffy.SharingCalendar.calendar.repository.EventRepository;
 import com.fluffy.SharingCalendar.exception.CustomException;
@@ -32,19 +29,15 @@ public class EventService {
     private final CalendarService calendarService;
     private final UserService userService;
     private final EventRepository eventRepository;
-    private final EventParticipantRepository eventParticipantRepository;
     private final EventQDslRepository eventQDslRepository;
-    private final CalendarRepository calendarRepository;
 
     @Transactional
     public void createEvent(RegisterEventRequestDto request, String loginId) {
         Calendar calendar = calendarService.checkAndFindCalendarById(request.getCalendarId(), loginId);
+        List<User> participants = getUsersFromIds(request.getParticipantsIds());
 
-        Event event = request.toEvent(calendar);
-        Event savedEvent = eventRepository.save(event);
-
-        saveParticipants(savedEvent, request.getParticipantsIds());
-
+        Event event = Event.create(request, calendar, participants);
+        eventRepository.save(event);
     }
 
     @Transactional(readOnly = true)
@@ -70,15 +63,9 @@ public class EventService {
     @Transactional
     public void updateEvent(int eventId, UpdateEventRequestDto request, String loginId) {
         Event event = checkPermission(eventId, loginId);
+        List<User> newParticipants = getUsersFromIds(request.getParticipantsIds());
 
-        event.update(request);
-
-        if (request.getParticipantsIds() != null) {
-            eventParticipantRepository.deleteByEvent(event);
-            saveParticipants(event, request.getParticipantsIds());
-        }
-
-        eventRepository.save(event);
+        event.update(request, newParticipants);
     }
 
     @Transactional
@@ -98,17 +85,12 @@ public class EventService {
         return images.get(random.nextInt(images.size()));
     }
 
-    private void saveParticipants(Event event, List<Integer> participantIds) {
-        if (participantIds != null && !participantIds.isEmpty()) {
-            participantIds.forEach(userId -> {
-                User user = userService.findByUserId(userId);
-                EventParticipant participant = EventParticipant.builder()
-                        .event(event)
-                        .user(user)
-                        .build();
-                eventParticipantRepository.save(participant);
-            });
-        }
+    private List<User> getUsersFromIds(List<Integer> participantIds) {
+        return (participantIds == null || participantIds.isEmpty())
+                ? List.of()
+                : participantIds.stream()
+                        .map(userService::findByUserId)
+                        .collect(Collectors.toList());
     }
 
     private Event checkPermission(int eventId, String loginId) {

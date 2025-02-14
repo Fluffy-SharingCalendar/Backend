@@ -5,9 +5,11 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class UpdateEventRequestDto {
 
     @Size(min = 1, max = 25, message = "제목 길이는 1~25자까지 입니다.")
@@ -25,7 +27,7 @@ public class UpdateEventRequestDto {
 
     @AssertTrue(message = "시작일은 종료일보다 앞서거나 같아야 합니다.")
     public boolean isValidDateRange() {
-        if(startDate != null && endDate != null) {
+        if (startDate != null && endDate != null) {
             return !startDate.isAfter(endDate);
         }
 
