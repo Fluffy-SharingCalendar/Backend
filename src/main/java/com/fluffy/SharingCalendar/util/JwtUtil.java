@@ -4,8 +4,8 @@ import com.fluffy.SharingCalendar.user.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +21,9 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    // 비밀 키를 SecretKeySpec을 사용하여 Key 객체로 생성
     private Key getSigningKey() {
-        return new SecretKeySpec(secret.getBytes(), SignatureAlgorithm.HS256.getJcaName());
+        byte[] keyBytes = secret.getBytes();
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(User user) {
@@ -31,7 +31,7 @@ public class JwtUtil {
                 .setSubject(user.getLoginId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY_SECONDS * 1000))
-                .signWith(getSigningKey())
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
 
         // 생성된 토큰을 로그로 출력
@@ -45,8 +45,8 @@ public class JwtUtil {
             token = token.substring(7); // "Bearer " 문자열 이후의 토큰만 추출
         }
 
-        Claims claims = Jwts.parserBuilder() // parser() -> parserBuilder()로 변경
-                .setSigningKey(secret)
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -55,8 +55,8 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parserBuilder() // parser() -> parserBuilder()로 변경
-                    .setSigningKey(secret)
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);
             return true;

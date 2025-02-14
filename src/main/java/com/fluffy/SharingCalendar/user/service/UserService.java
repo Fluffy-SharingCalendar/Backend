@@ -1,18 +1,21 @@
 package com.fluffy.SharingCalendar.user.service;
 
-import com.fluffy.SharingCalendar.domain.SecurityAnswer;
-import com.fluffy.SharingCalendar.domain.SecurityQuestion;
+import com.fluffy.SharingCalendar.user.domain.SecurityAnswer;
+import com.fluffy.SharingCalendar.user.domain.SecurityQuestion;
 import com.fluffy.SharingCalendar.user.domain.User;
 import com.fluffy.SharingCalendar.user.dto.SecurityAnswerDto;
 import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
 import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
 import com.fluffy.SharingCalendar.exception.CustomException;
+import com.fluffy.SharingCalendar.user.dto.request.VerifyUserIdentityRequestDto;
 import com.fluffy.SharingCalendar.user.repository.SecurityAnswerRepository;
 import com.fluffy.SharingCalendar.user.repository.SecurityQuestionRepository;
 import com.fluffy.SharingCalendar.user.repository.UserRepository;
 import com.fluffy.SharingCalendar.util.JwtUtil;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,6 +96,8 @@ public class UserService {
 
         User user = findByLoginId(loginId);
 
+        checkIfUserIsDeleted(user);
+
         return UserInfoDto.builder()
                 .name(user.getName())
                 .loginId(user.getLoginId())
@@ -104,11 +109,23 @@ public class UserService {
     public void registerUser(RegisterUserRequestDto requestDto) {
         validateRegistrationData(requestDto);
 
+        checkDuplicateSecurityAnswers(requestDto.getSecurityAnswers());
+
         User user = createUser(requestDto);
         userRepository.save(user);
 
         List<SecurityAnswer> securityAnswers = createSecurityAnswers(requestDto.getSecurityAnswers(), user);
         securityAnswerRepository.saveAll(securityAnswers);
+    }
+
+    private void checkDuplicateSecurityAnswers(List<SecurityAnswerDto> securityAnswers) {
+        Set<Integer> seenQuestionIds = new HashSet<>();
+
+        for (SecurityAnswerDto answerDto : securityAnswers) {
+            if (!seenQuestionIds.add(answerDto.questionId())) {
+                throw new CustomException(SECURITY_ANSWER_DUPLICATED); // 중복된 questionId가 있을 경우 예외 발생
+            }
+        }
     }
 
     private void validateRegistrationData(RegisterUserRequestDto requestDto){
@@ -157,9 +174,76 @@ public class UserService {
 
     public String login(LoginRequestDto requestDto) {
         User user = findByLoginId(requestDto.getLoginId());
+
+        checkIfUserIsDeleted(user);
+
         if(!user.checkPassword(requestDto.getPassword(), passwordEncoder)){
             throw new CustomException(INVALID_CREDENTIALS);
         }
         return jwtUtil.generateToken(user);
     }
+
+    private void checkIfUserIsDeleted(User user) {
+        if (user.getIsDeleted() == 'Y') {
+            throw new CustomException(DEACTIVATED_USER);
+        }
+    }
+
+    @Transactional
+    public boolean verifySecurityAnswer(String token, VerifyUserIdentityRequestDto requestDto) {
+        String loginIdFromToken = jwtUtil.getLoginId(token);
+        String loginIdFromRequest = requestDto.getLoginId();
+
+        if (!loginIdFromToken.equals(loginIdFromRequest)) {
+            throw new CustomException(MISMATCHED_LOGIN_ID);
+        }
+
+        User user = findByLoginId(loginIdFromToken);
+
+        checkIfUserIsDeleted(user);
+
+        SecurityAnswer securityAnswer = securityAnswerRepository.findByUserAndQuestionId(user, requestDto.getQuestionId())
+                .orElseThrow(() -> new CustomException(SECURITY_QUESTION_NOT_FOUND));
+
+        if (!securityAnswer.getAnswer().equals(requestDto.getAnswer())) {
+            throw new CustomException(INVALID_SECURITY_ANSWER);
+        }
+
+        return true;
+    }
+
+    @Transactional
+    public void changePassword(String token, String newPassword) {
+        String loginId = jwtUtil.getLoginId(token);
+
+        User user = findByLoginId(loginId);
+
+        checkIfUserIsDeleted(user);
+        validatePassword(newPassword);
+
+        user.setPassword(newPassword);
+        user.hashPassword(passwordEncoder);
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deactivateAccount(String token, String password) {
+        String loginId = jwtUtil.getLoginId(token);
+
+        User user = findByLoginId(loginId);
+        checkIfUserIsDeleted(user);
+
+        if (!user.checkPassword(password, passwordEncoder)) {
+            throw new CustomException(INVALID_CREDENTIALS);
+        }
+
+        user.setIsDeleted('Y');
+
+        userRepository.save(user);
+    }
+
+
+
+
 }

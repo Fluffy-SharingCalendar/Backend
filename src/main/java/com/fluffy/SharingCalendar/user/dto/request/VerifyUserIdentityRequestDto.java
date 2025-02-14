@@ -1,12 +1,12 @@
 package com.fluffy.SharingCalendar.user.dto.request;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class LoginRequestDto {
+public class VerifyUserIdentityRequestDto {
     private String loginId;
-    private String password;
+    private Integer questionId;
+    private String answer;
 }

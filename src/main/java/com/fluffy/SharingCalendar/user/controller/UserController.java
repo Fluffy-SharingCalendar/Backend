@@ -1,9 +1,12 @@
 package com.fluffy.SharingCalendar.user.controller;
 
+import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
 import com.fluffy.SharingCalendar.user.dto.request.CheckLoginIdRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
+import com.fluffy.SharingCalendar.user.dto.request.VerifyUserIdentityRequestDto;
 import com.fluffy.SharingCalendar.user.service.UserService;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,6 +43,43 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).headers(headers).build();
     }
 
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<UserInfoDto> getUserInfo(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
+        UserInfoDto userInfo = userService.getUserInfo(jwtToken);
+        return ResponseEntity.ok(userInfo);
+    }
+
+    @PostMapping("/verification")
+    public ResponseEntity<?> verifyUserIdentity(@RequestBody VerifyUserIdentityRequestDto requestDto, @RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        boolean isVerified = userService.verifySecurityAnswer(jwtToken, requestDto);
+
+        return isVerified ? ResponseEntity.ok(Collections.singletonMap("message", "본인 인증이 성공하였습니다.")) : ResponseEntity.status(400).build();
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request, @RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String newPassword = request.get("newPassword");
+
+        userService.changePassword(jwtToken, newPassword);
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 성공적으로 변경되었습니다."));
+    }
+
+    @PatchMapping("/deactivate")
+    public ResponseEntity<?> cancelAccount(@RequestBody Map<String, String> request, @RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String password = request.get("password");
+
+        userService.deactivateAccount(jwtToken, password);
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "회원 탈퇴가 완료되었습니다."));
+
+    }
 
 }

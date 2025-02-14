@@ -1,8 +1,9 @@
 package com.fluffy.SharingCalendar.user.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 
-
+@Getter
 @Builder
 public class UserInfoDto {
     private final String name;
