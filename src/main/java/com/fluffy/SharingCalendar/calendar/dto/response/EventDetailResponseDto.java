@@ -2,6 +2,7 @@ package com.fluffy.SharingCalendar.calendar.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fluffy.SharingCalendar.calendar.dto.EventDto;
+import java.util.List;
 import lombok.Getter;
 
 import java.net.URL;
@@ -18,6 +19,9 @@ public class EventDetailResponseDto {
     private final LocalDate endDate;
 
     private final String color;
+
+    private List<EventParticipantResponseDto> participants;
+
     private final URL randomImageUrl;
 
     public EventDetailResponseDto(EventDto eventDto, URL randomImageUrl) {
