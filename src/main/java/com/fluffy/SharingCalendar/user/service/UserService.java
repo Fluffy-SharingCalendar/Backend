@@ -213,5 +213,22 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void deactivateAccount(String token, String password) {
+        String loginId = jwtUtil.getLoginId(token);
+
+        User user = findByLoginId(loginId);
+
+        if (!user.checkPassword(password, passwordEncoder)) {
+            throw new CustomException(INVALID_CREDENTIALS);
+        }
+
+        user.setIsDeleted('Y');
+
+        userRepository.save(user);
+    }
+
+
+
 
 }
