@@ -1,5 +1,6 @@
 package com.fluffy.SharingCalendar.user.controller;
 
+import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
 import com.fluffy.SharingCalendar.user.dto.request.CheckLoginIdRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
@@ -40,6 +41,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).headers(headers).build();
     }
 
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<UserInfoDto> getUserInfo(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
+        UserInfoDto userInfo = userService.getUserInfo(jwtToken);
+        return ResponseEntity.ok(userInfo);
+    }
 
 }

@@ -1,6 +1,5 @@
-package com.fluffy.SharingCalendar.domain;
+package com.fluffy.SharingCalendar.user.domain;
 
-import com.fluffy.SharingCalendar.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

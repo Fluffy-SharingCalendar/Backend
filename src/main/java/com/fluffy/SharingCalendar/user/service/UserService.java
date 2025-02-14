@@ -1,7 +1,7 @@
 package com.fluffy.SharingCalendar.user.service;
 
-import com.fluffy.SharingCalendar.domain.SecurityAnswer;
-import com.fluffy.SharingCalendar.domain.SecurityQuestion;
+import com.fluffy.SharingCalendar.user.domain.SecurityAnswer;
+import com.fluffy.SharingCalendar.user.domain.SecurityQuestion;
 import com.fluffy.SharingCalendar.user.domain.User;
 import com.fluffy.SharingCalendar.user.dto.SecurityAnswerDto;
 import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
