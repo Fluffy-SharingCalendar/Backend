@@ -1,6 +1,7 @@
 package com.fluffy.SharingCalendar.user.controller;
 
 import com.fluffy.SharingCalendar.user.dto.UserInfoDto;
+import com.fluffy.SharingCalendar.user.dto.request.ChangePasswordRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.CheckLoginIdRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.LoginRequestDto;
 import com.fluffy.SharingCalendar.user.dto.request.RegisterUserRequestDto;
@@ -57,7 +58,16 @@ public class UserController {
 
         boolean isVerified = userService.verifySecurityAnswer(jwtToken, requestDto);
 
-        return isVerified ? ResponseEntity.ok().build() : ResponseEntity.status(400).build();
+        return isVerified ? ResponseEntity.ok(Collections.singletonMap("message", "본인 인증이 성공하였습니다.")) : ResponseEntity.status(400).build();
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDto requestDto, @RequestHeader("Authorization") String token) {
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        userService.changePassword(jwtToken, requestDto.getNewPassword());
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
 
 }

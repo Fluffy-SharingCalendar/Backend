@@ -199,5 +199,19 @@ public class UserService {
         return true;
     }
 
+    @Transactional
+    public void changePassword(String token, String newPassword) {
+        String loginId = jwtUtil.getLoginId(token);
+
+        User user = findByLoginId(loginId);
+
+        validatePassword(newPassword);
+
+        user.setPassword(newPassword);
+        user.hashPassword(passwordEncoder);
+
+        userRepository.save(user);
+    }
+
 
 }
